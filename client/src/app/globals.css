@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@layer theme {
+}
+
+@layer base {
+  html {
+    @apply overflow-auto! p-0!;
+  }
+
+  body {
+    @apply font-sans;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+}
