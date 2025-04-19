@@ -3,8 +3,16 @@ import Link from "next/link";
 import Features from "../components/Home/Features";
 import Stats from "../components/Home/Stats";
 import Testimonials from "../components/Home/Testimonials";
+import getServerSession from "../libs/session";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
+  const session = await getServerSession();
+
+  // if (session) {
+  //   redirect("/cong-viec");
+  // }
+
   return (
     <div>
       <section className="h-screen w-full relative">

@@ -21,16 +21,14 @@ export class Board extends BaseEntity {
   title: string;
 
   @Column({
-    type: "text",
     nullable: true,
   })
-  wallpaper: string;
+  cover: string;
 
   @Column({
-    type: "text",
     nullable: true,
   })
-  wallpaperColor: string;
+  coverColor: string;
 
   @Column({
     type: "enum",
@@ -42,7 +40,7 @@ export class Board extends BaseEntity {
   @OneToMany(() => Task, (task) => task.board, {
     cascade: true,
   })
-  tasks: Board[];
+  tasks: Task[];
 
   @OneToMany(() => BoardMember, (boardMember) => boardMember.board, {
     cascade: true,

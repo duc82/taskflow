@@ -12,6 +12,7 @@ import { TasksService } from "./tasks.service";
 import { QueryDto } from "src/dtos/query.dto";
 import { CustomParseUUIDPipe } from "src/pipes/CustomParseUUIDPipe.pipe";
 import { CreateTaskDto } from "./tasks.dto";
+import { User } from "src/decorators/user.decorator";
 
 @Controller("tasks")
 export class TasksController {
@@ -20,6 +21,14 @@ export class TasksController {
   @Get()
   async getAll(@Query() query: QueryDto) {
     return this.taskService.findAll(query);
+  }
+
+  @Get("inbox")
+  async getAllByUserInbox(
+    @Query() query: QueryDto,
+    @User("userId") userId: string,
+  ) {
+    return this.taskService.findAllByUserInbox(query, userId);
   }
 
   @Get(":id")

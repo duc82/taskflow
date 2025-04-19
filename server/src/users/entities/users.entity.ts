@@ -84,6 +84,11 @@ export class User extends BaseEntity {
   })
   taskActivities: TaskActivity[];
 
+  @OneToMany(() => Task, (task) => task.userInbox, {
+    cascade: true,
+  })
+  inboxes: Task[];
+
   @DeleteDateColumn({
     type: "timestamptz",
     name: "deletedAt",

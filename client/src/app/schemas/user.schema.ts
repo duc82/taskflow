@@ -8,6 +8,10 @@ export const userSchema = z.object({
     .email("Email không hợp lệ")
     .nonempty("Email không được để trống"),
   name: z.string().nonempty("Tên không được để trống"),
+  avatar: z
+    .any()
+    .optional()
+    .refine((file) => file?.length === 1, "Vui lòng chọn ảnh đại diện"),
 });
 
 export const updatePasswordSchema = z

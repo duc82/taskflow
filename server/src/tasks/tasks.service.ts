@@ -34,6 +34,30 @@ export class TasksService {
     };
   }
 
+  async findAllByUserInbox(query: QueryDto, userId: string) {
+    const { search, page, limit } = query;
+
+    const skip = (page - 1) * limit;
+
+    const [tasks, total] = await this.tasksRepository.findAndCount({
+      skip,
+      take: limit,
+      where: {
+        title: ILike(`%${search}%`),
+        userInbox: {
+          id: userId,
+        },
+      },
+    });
+
+    return {
+      tasks,
+      total,
+      page,
+      limit,
+    };
+  }
+
   async create(task: CreateTaskDto) {
     const newTask = this.tasksRepository.create(task);
     await this.tasksRepository.save(newTask);

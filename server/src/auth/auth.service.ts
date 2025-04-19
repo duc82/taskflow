@@ -13,6 +13,7 @@ import { ConfigService } from "@nestjs/config";
 import { UserToken } from "src/users/entities/user_tokens.entity";
 import { MailerService } from "src/mailer/mailer.service";
 import { Response } from "express";
+import { AvatarService } from "src/avatar/avatar.service";
 
 @Injectable()
 export class AuthService {

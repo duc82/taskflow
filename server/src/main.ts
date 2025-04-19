@@ -6,6 +6,7 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
+import * as bodyParser from "body-parser";
 import { AllExceptionsFilter } from "./filters/all-exceptions.filter";
 
 async function bootstrap() {
@@ -17,6 +18,8 @@ async function bootstrap() {
     origin: allowedOrigin,
     credentials: true,
   });
+  app.use(bodyParser.json({ limit: "50mb" }));
+  app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
   app.use(cookieParser());
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));

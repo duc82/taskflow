@@ -9,7 +9,9 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { QueryDto } from "src/dtos/query.dto";
@@ -20,6 +22,7 @@ import { Roles } from "src/decorators/roles.decorator";
 import { UserRole } from "./users.enum";
 import { User } from "src/decorators/user.decorator";
 import { UserPayload } from "./users.interface";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @UseGuards(AuthGuard)
 @Controller("users")
@@ -54,11 +57,16 @@ export class UsersController {
   }
 
   @Post("update/profile")
+  @UseInterceptors(FileInterceptor("avatar"))
   @HttpCode(HttpStatus.OK)
-  async updateProfile(@User() user: UserPayload, @Body() body: UpdateUserDto) {
+  async updateProfile(
+    @User() user: UserPayload,
+    @Body() body: UpdateUserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     return {
       message: "Cập nhật thông tin tài khoản thành công",
-      user: await this.userService.update(user.userId, body),
+      user: await this.userService.update(user.userId, body, file),
     };
   }
 
@@ -72,13 +80,15 @@ export class UsersController {
   }
 
   @Put("update/:id")
+  @UseInterceptors(FileInterceptor("avatar"))
   async updateUser(
     @Param("id", new CustomParseUUIDPipe()) id: string,
     @Body() body: UpdateUserDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     return {
       message: "Cập nhật người dùng thành công",
-      user: await this.userService.update(id, body),
+      user: await this.userService.update(id, body, file),
     };
   }
 

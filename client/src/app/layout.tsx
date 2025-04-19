@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ProgressBar from "./libs/ProgressBar";
-import Toast from "./libs/Toast";
+import ProgressBar from "./components/ProgressBar";
+import Toast from "./components/Toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

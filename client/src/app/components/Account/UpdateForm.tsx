@@ -2,21 +2,24 @@
 
 import { UserDto, userSchema } from "@/app/schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import Spinner from "../Spinner";
 import { User, UserReponse } from "@/app/types/user";
-import { XCircleIcon } from "@heroicons/react/24/solid";
+import { ArrowUpTrayIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import fetchAuth from "@/app/libs/fetchAuth";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 export default function UpdateForm({ user }: { user: User }) {
   const { update } = useSession();
+  const [filePreview, setFilePreview] = useState<FilePreview | null>(null);
 
   const {
     register,
     handleSubmit,
+
     formState: { errors, isSubmitting },
   } = useForm<UserDto>({
     resolver: zodResolver(userSchema),
@@ -30,9 +33,14 @@ export default function UpdateForm({ user }: { user: User }) {
 
   const onSubmit = async (data: UserDto) => {
     try {
+      const formData = new FormData();
+      formData.append("email", data.email);
+      formData.append("name", data.name);
+      formData.append("avatar", data.avatar[0]);
+
       const result = await fetchAuth<UserReponse>("/users/update/profile", {
         method: "POST",
-        body: JSON.stringify(data),
+        body: formData,
       });
       await update(result.user);
       toast.success(result.message);
@@ -62,6 +70,46 @@ export default function UpdateForm({ user }: { user: User }) {
       )}
 
       <div className="space-y-6">
+        <div className="flex items-center">
+          <Image
+            src={filePreview?.preview || user.avatar}
+            alt={user.name}
+            width={64}
+            height={64}
+            className="rounded-full object-cover w-16 h-16"
+            onLoad={() => {
+              if (filePreview) {
+                URL.revokeObjectURL(filePreview.preview);
+              }
+            }}
+          />
+          <label
+            htmlFor="avatar"
+            className="flex items-center space-x-1 ml-3 cursor-pointer bg-blue-600 text-white px-3 py-1.5 font-semibold shadow-xs text-sm/4 rounded-md hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+          >
+            <ArrowUpTrayIcon className="size-5" />
+            <span>Tải lên</span>
+            <input
+              type="file"
+              id="avatar"
+              {...register("avatar", {
+                onChange(event: ChangeEvent<HTMLInputElement>) {
+                  const files = event.target.files;
+                  if (files) {
+                    const preview = URL.createObjectURL(files[0]);
+                    setFilePreview({
+                      ...files[0],
+                      preview,
+                    });
+                  }
+                },
+              })}
+              multiple={false}
+              accept="image/*"
+              hidden
+            />
+          </label>
+        </div>
         <div>
           <label
             htmlFor="email"

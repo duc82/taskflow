@@ -29,7 +29,7 @@ export default function Login() {
         ...result.user,
         accessToken: result.accessToken,
         redirect: true,
-        redirectTo: "/",
+        redirectTo: "/cong-viec",
       });
     } catch (error) {
       if (error instanceof Error) {

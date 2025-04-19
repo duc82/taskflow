@@ -15,7 +15,9 @@ const fetchAuth = async <T>(url: string, init?: RequestInit): Promise<T> => {
   const headers = new Headers(init?.headers || {});
 
   headers.set("Authorization", `Bearer ${accessToken}`);
-  headers.set("Content-Type", "application/json");
+  if (!(init?.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
 
   const res = await fetch(`${API_URL}${url}`, {
     ...init,

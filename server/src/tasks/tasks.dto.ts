@@ -5,7 +5,6 @@ import {
   IsString,
   ValidateIf,
 } from "class-validator";
-import { TaskStatus } from "./tasks.enum";
 
 export class CreateTaskDto {
   @IsNotEmpty({
@@ -26,12 +25,6 @@ export class CreateTaskDto {
     },
   )
   dueDate: Date;
-
-  @IsNotEmpty({
-    message: "Trạng thái không được để trống",
-  })
-  @IsEnum(TaskStatus)
-  status: TaskStatus;
 
   @IsNotEmpty({
     message: "Tiến độ không được để trống",

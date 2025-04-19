@@ -1,20 +1,28 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
 import { DataSource, ILike, In, Not } from "typeorm";
 import { User } from "./entities/users.entity";
 import { CreateUserDto, UpdatePasswordDto, UpdateUserDto } from "./users.dto";
 import { QueryDto } from "src/dtos/query.dto";
+import { AvatarService } from "src/avatar/avatar.service";
+import { CloudinaryService } from "src/cloudinary/cloudinary.service";
+import { UploadApiResponse } from "cloudinary";
 
 @Injectable()
 export class UsersService {
   public readonly userRepository = this.dataSource.getRepository(User);
 
-  constructor(private dataSource: DataSource) {}
+  constructor(
+    private avatarService: AvatarService,
+    private cloudinaryService: CloudinaryService,
+    private dataSource: DataSource,
+  ) {}
 
-  async create(user: CreateUserDto) {
+  async create(user: CreateUserDto, file?: Express.Multer.File) {
     const existingUser = await this.userRepository.findOne({
       where: {
         email: user.email,
@@ -25,7 +33,29 @@ export class UsersService {
       throw new BadRequestException("Email đã tồn tại");
     }
 
-    const newUser = this.userRepository.create(user);
+    let avatarRes: UploadApiResponse = null;
+
+    try {
+      if (!file) {
+        const buffer = await this.avatarService.generateAvatar(user.name);
+        avatarRes = await this.cloudinaryService.uploadFile(buffer, {
+          folder: "taskflow/avatars",
+          public_id: user.email,
+        });
+      } else {
+        avatarRes = await this.cloudinaryService.uploadFile(file, {
+          folder: "taskflow/avatars",
+          public_id: user.email,
+        });
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+
+    const newUser = this.userRepository.create({
+      ...user,
+      avatar: avatarRes.secure_url,
+    });
     await this.userRepository.save(newUser);
     return newUser;
   }
@@ -94,7 +124,7 @@ export class UsersService {
     };
   }
 
-  async update(id: string, user: UpdateUserDto) {
+  async update(id: string, user: UpdateUserDto, file?: Express.Multer.File) {
     const userToUpdate = await this.userRepository.findOne({
       where: {
         id,
@@ -103,6 +133,15 @@ export class UsersService {
 
     if (!userToUpdate) {
       throw new NotFoundException("Người dùng không tồn tại");
+    }
+
+    if (file) {
+      const avatarRes = await this.cloudinaryService.uploadFile(file, {
+        folder: "taskflow/avatars",
+        public_id: userToUpdate.email,
+      });
+
+      userToUpdate.avatar = avatarRes.secure_url;
     }
 
     Object.assign(userToUpdate, user);
@@ -163,7 +202,7 @@ export class UsersService {
       throw new NotFoundException("Người dùng không tồn tại");
     }
 
-    await this.userRepository.remove(user);
+    await this.userRepository.delete(id);
 
     return {
       message: "Xóa người dùng thành công",

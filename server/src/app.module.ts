@@ -13,6 +13,8 @@ import { MailerModule } from "./mailer/mailer.module";
 import { google } from "googleapis";
 import { BoardsModule } from "./boards/boards.module";
 import { ArchivesModule } from "./archives/archives.module";
+import { AvatarModule } from "./avatar/avatar.module";
+import { CloudinaryModule } from "./cloudinary/cloudinary.module";
 const OAuth2 = google.auth.OAuth2;
 
 @Module({
@@ -80,6 +82,17 @@ const OAuth2 = google.auth.OAuth2;
       },
     }),
 
+    CloudinaryModule.configure({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          cloud_name: configService.getOrThrow<string>("CLOUDINARY_CLOUD_NAME"),
+          api_key: configService.getOrThrow<string>("CLOUDINARY_API_KEY"),
+          api_secret: configService.getOrThrow<string>("CLOUDINARY_API_SECRET"),
+        };
+      },
+    }),
+
     JwtGlobalModule,
     UsersModule,
     TasksModule,
@@ -88,6 +101,7 @@ const OAuth2 = google.auth.OAuth2;
     MailerModule,
     BoardsModule,
     ArchivesModule,
+    AvatarModule,
   ],
   controllers: [AppController],
   providers: [AppService],

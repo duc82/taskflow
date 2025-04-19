@@ -21,7 +21,6 @@ import useScroll from "../hooks/useScroll";
 import clsx from "clsx";
 import {
   ArrowLeftStartOnRectangleIcon,
-  ChevronDownIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/solid";
 import { Session } from "next-auth";
@@ -52,7 +51,7 @@ export default function Header({ session }: { session: Session | null }) {
       )}
     >
       <nav className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-        <Link href="/">
+        <Link href={session ? "/cong-viec" : "/"}>
           <Image
             src={logo}
             alt="Logo"
@@ -109,16 +108,44 @@ export default function Header({ session }: { session: Session | null }) {
                 className="text-sm/6 text-white/80 hover:text-white cursor-pointer font-semibold flex items-center gap-x-2"
                 aria-label={session.user.name}
               >
-                <UserCircleIcon className="size-5" /> {session.user.name}{" "}
-                <ChevronDownIcon className="size-4" />
+                <Image
+                  src={session.user.avatar}
+                  alt={session.user.name}
+                  width={36}
+                  height={36}
+                  className="rounded-full object-cover"
+                />
               </MenuButton>
-              <MenuItems className="bg-white text-sm/6 font-medium text-gray-900 absolute top-full right-0 mt-4 p-1 w-52 rounded-md shadow border border-gray-300 z-50">
+              <MenuItems className="bg-white text-sm/6 font-medium text-gray-900 absolute top-full right-0 mt-4 p-1 w-60 rounded-md shadow border border-gray-300 z-50">
+                <MenuItem>
+                  <div className="px-3 py-1.5 rounded-md">
+                    <div className="flex items-center">
+                      <Image
+                        src={session.user.avatar}
+                        alt={session.user.name}
+                        width={40}
+                        height={40}
+                        className="rounded-full object-cover"
+                      />
+                      <div className="ml-1.5">
+                        <h3 className="font-semibold text-sm">
+                          {session.user.name}
+                        </h3>
+                        <p className="text-gray-700 text-xs">
+                          {session.user.email}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </MenuItem>
+
                 <MenuItem>
                   <Link
                     className="flex items-center space-x-1.5 hover:bg-gray-100 px-3 py-1.5 rounded-md"
                     href="/tai-khoan"
                   >
                     <UserCircleIcon className="size-4" />
+
                     <span>Tài khoản</span>
                   </Link>
                 </MenuItem>
@@ -213,13 +240,30 @@ export default function Header({ session }: { session: Session | null }) {
               <div className="py-6">
                 {session ? (
                   <>
+                    <div className="py-2 rounded-lg text-gray-900 text-base/7">
+                      <div className="flex items-center">
+                        <Image
+                          src={session.user.avatar}
+                          alt={session.user.name}
+                          width={40}
+                          height={40}
+                          className="rounded-full"
+                        />
+                        <div className="ml-2">
+                          <h3 className="font-semibold">{session.user.name}</h3>
+                          <p className="text-gray-700 text-sm">
+                            {session.user.email}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                     <Link
                       href="/tai-khoan"
                       aria-label={session.user.name}
                       className="-mx-3 flex items-center space-x-1.5 rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
                     >
                       <UserCircleIcon className="size-4" />
-                      <span>{session.user.name}</span>
+                      <span>Tài khoản</span>
                     </Link>
                     <button
                       type="button"

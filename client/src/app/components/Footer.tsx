@@ -1,13 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/app/assets/taskflow.png";
+import { Session } from "next-auth";
 
-export default function Footer() {
+export default function Footer({ session }: { session: Session | null }) {
   return (
     <footer className="bg-slate-900">
       <div className="p-4 md:py-8 max-w-7xl mx-auto">
         <div className="sm:flex sm:items-center sm:justify-between">
-          <Link href="/" className="flex items-center mb-4 sm:mb-0">
+          <Link
+            href={session ? "/cong-viec" : "/"}
+            className="flex items-center mb-4 sm:mb-0"
+          >
             <Image
               src={logo}
               width={0}

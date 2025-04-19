@@ -42,13 +42,11 @@ export class Task extends BaseEntity {
   isWatching: boolean;
 
   @Column({
-    type: "text",
     nullable: true,
   })
   cover: string;
 
   @Column({
-    type: "text",
     nullable: true,
   })
   coverColor: string;
@@ -92,10 +90,15 @@ export class Task extends BaseEntity {
   })
   board: Board;
 
+  @ManyToOne(() => User, (user) => user.inboxes, {
+    onDelete: "CASCADE",
+  })
+  userInbox: User;
+
   @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   startDate: Date;
 
-  @Column({ type: "timestamptz" })
+  @Column({ type: "timestamptz", nullable: true })
   dueDate: Date;
 
   @DeleteDateColumn({
