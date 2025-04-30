@@ -1,6 +1,5 @@
 export enum BoardVisibility {
   PRIVATE = "private",
-  WORKSPACE = "workspace",
   PUBLIC = "public",
 }
 

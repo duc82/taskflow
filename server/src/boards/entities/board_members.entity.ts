@@ -5,9 +5,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { MemberRole } from "../boards.enum";
 import { User } from "src/users/entities/users.entity";
 import { Board } from "./boards.entity";
+import { MemberRole } from "../boards.enum";
 
 @Entity("board_members")
 export class BoardMember extends BaseEntity {
@@ -22,4 +22,7 @@ export class BoardMember extends BaseEntity {
 
   @Column({ type: "enum", enum: MemberRole, default: MemberRole.MEMBER })
   role: MemberRole;
+
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  joinedAt: Date;
 }

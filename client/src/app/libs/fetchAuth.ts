@@ -1,9 +1,18 @@
 "use client";
 import { getSession } from "next-auth/react";
 
+type METHOD = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+interface CustomRequestInit extends RequestInit {
+  method?: METHOD;
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const fetchAuth = async <T>(url: string, init?: RequestInit): Promise<T> => {
+const fetchAuth = async <T>(
+  url: string,
+  init?: CustomRequestInit
+): Promise<T> => {
   const session = await getSession();
 
   if (!session) {

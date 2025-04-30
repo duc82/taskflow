@@ -1,3 +1,4 @@
+import { Column } from "./column";
 import { User } from "./user";
 
 export interface BoardMember {
@@ -12,7 +13,9 @@ export interface Board {
   title: string;
   cover: string | null;
   coverColor: string | null;
+  columns: Column[];
   members: BoardMember[];
+  visibility: "private" | "public";
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;

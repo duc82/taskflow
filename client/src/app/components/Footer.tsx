@@ -1,9 +1,18 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/app/assets/taskflow.png";
 import { Session } from "next-auth";
+import { usePathname } from "next/navigation";
 
 export default function Footer({ session }: { session: Session | null }) {
+  const pathname = usePathname();
+  const pathnames = pathname.split("/").slice(1);
+
+  if (pathnames[0] === "cong-viec" && pathnames.length >= 2) {
+    return null;
+  }
+
   return (
     <footer className="bg-slate-900">
       <div className="p-4 md:py-8 max-w-7xl mx-auto">

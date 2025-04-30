@@ -57,6 +57,7 @@ export class UsersService {
       avatar: avatarRes.secure_url,
     });
     await this.userRepository.save(newUser);
+
     return newUser;
   }
 

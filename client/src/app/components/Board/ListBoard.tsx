@@ -44,7 +44,7 @@ export default function ListBoard({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
+    <div className="flex-4/5 pl-2">
       <div className="flex items-center justify-between mb-4">
         <h1 className="font-semibold text-2xl text-gray-800">
           Các bảng của bạn

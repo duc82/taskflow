@@ -11,7 +11,9 @@ export default async function Boards() {
 
   return (
     <section className="w-full py-24 lg:py-28 h-screen">
-      <ListBoard initialBoards={boards} unplashImages={unplashImages} />
+      <div className="max-w-7xl mx-auto px-4 flex">
+        <ListBoard initialBoards={boards} unplashImages={unplashImages} />
+      </div>
     </section>
   );
 }

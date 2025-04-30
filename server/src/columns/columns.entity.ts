@@ -1,8 +1,9 @@
+import { Board } from "src/boards/entities/boards.entity";
 import { Task } from "src/tasks/entities/tasks.entity";
 import { User } from "src/users/entities/users.entity";
 import {
   BaseEntity,
-  Column,
+  Column as ColumnTypeorm,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -12,21 +13,29 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-@Entity("categories")
-export class Category extends BaseEntity {
+@Entity("columns")
+export class Column extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column()
-  name: string;
+  @ColumnTypeorm()
+  title: string;
 
-  @Column({ type: "text", nullable: true })
+  @ColumnTypeorm({
+    type: "double precision",
+  })
+  position: number;
+
+  @ColumnTypeorm({ type: "text", nullable: true })
   description: string;
 
-  @ManyToOne(() => User, (user) => user.categories, { onDelete: "CASCADE" })
+  @ManyToOne(() => User, (user) => user.columns, { onDelete: "CASCADE" })
   user: User;
 
-  @OneToMany(() => Task, (task) => task.category)
+  @ManyToOne(() => Board, (board) => board.columns, { onDelete: "CASCADE" })
+  board: Board;
+
+  @OneToMany(() => Task, (task) => task.column)
   tasks: Task[];
 
   @DeleteDateColumn({

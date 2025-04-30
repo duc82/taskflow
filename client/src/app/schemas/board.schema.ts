@@ -4,7 +4,7 @@ export const boardSchema = z.object({
   title: z.string().nonempty("Tên bảng không được để trống"),
   cover: z.string().optional(),
   coverColor: z.string().optional(),
-  visibility: z.enum(["workspace", "private", "public"], {
+  visibility: z.enum(["private", "public"], {
     errorMap: () => ({ message: "Quyền xem không hợp lệ" }),
   }),
 });

@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { DataSource, ILike, In, Not } from "typeorm";
 import { Task } from "./entities/tasks.entity";
 import { QueryDto } from "src/dtos/query.dto";
-import { CreateTaskDto } from "./tasks.dto";
+import { CreateTaskDto, SwitchPositionTaskDto } from "./tasks.dto";
 
 @Injectable()
 export class TasksService {
@@ -24,6 +28,7 @@ export class TasksService {
         title: ILike(`%${search}%`),
         id: Not(In(excludeIds)),
       },
+      relations: ["userInbox", "category", "board"],
     });
 
     return {
@@ -48,6 +53,9 @@ export class TasksService {
           id: userId,
         },
       },
+      order: {
+        position: "DESC",
+      },
     });
 
     return {
@@ -58,8 +66,23 @@ export class TasksService {
     };
   }
 
-  async create(task: CreateTaskDto) {
-    const newTask = this.tasksRepository.create(task);
+  async create(task: CreateTaskDto, userId: string) {
+    const { boardId, columnId, ...otherData } = task;
+
+    const maxPosition = await this.tasksRepository
+      .createQueryBuilder("task")
+      .select("MAX(task.position)", "maxPosition")
+      .getRawOne<{ maxPosition: number | null }>();
+
+    const newTask = this.tasksRepository.create({
+      ...otherData,
+      user: { id: userId },
+      column: { id: columnId },
+      board: boardId ? null : { id: boardId },
+      userInbox: columnId ? null : { id: userId },
+      position: (maxPosition?.maxPosition ?? 0) + 1000,
+    });
+
     await this.tasksRepository.save(newTask);
     return newTask;
   }
@@ -74,6 +97,60 @@ export class TasksService {
     }
 
     return task;
+  }
+
+  async switchPosition(
+    id: string,
+    { beforeTaskId, afterTaskId }: SwitchPositionTaskDto,
+  ) {
+    let newPosition: number;
+
+    if (beforeTaskId && afterTaskId) {
+      const [before, after] = await Promise.all([
+        this.tasksRepository.findOne({
+          where: {
+            id: beforeTaskId,
+          },
+          select: ["id", "position"],
+        }),
+        this.tasksRepository.findOne({
+          where: {
+            id: afterTaskId,
+          },
+          select: ["id", "position"],
+        }),
+      ]);
+      newPosition = (before.position + after.position) / 2;
+    } else if (beforeTaskId && !afterTaskId) {
+      // Drag to last list
+      const before = await this.tasksRepository.findOne({
+        where: {
+          id: beforeTaskId,
+        },
+        select: ["id", "position"],
+      });
+      newPosition = before.position + 1000;
+    } else if (!beforeTaskId && afterTaskId) {
+      // Drag to first list
+      const after = await this.tasksRepository.findOne({
+        where: {
+          id: afterTaskId,
+        },
+        select: ["id", "position"],
+      });
+      newPosition = after.position / 2;
+    } else {
+      newPosition = 1000;
+    }
+
+    await this.tasksRepository.update(id, {
+      position: newPosition,
+    });
+
+    return {
+      message: "Đổi vị trí công việc thành công",
+      newPosition,
+    };
   }
 
   async update(id: string, task: Partial<CreateTaskDto>) {

@@ -9,72 +9,75 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { TasksService } from "./tasks.service";
 import { QueryDto } from "src/dtos/query.dto";
 import { CustomParseUUIDPipe } from "src/pipes/CustomParseUUIDPipe.pipe";
-import { CreateTaskDto, SwitchPositionTaskDto } from "./tasks.dto";
 import { User } from "src/decorators/user.decorator";
 import { AuthGuard } from "src/guards/auth.guard";
+import { CreateColumnDto, SwitchPositionColumnDto } from "./columns.dto";
+import { ColumnsService } from "./columns.service";
 
 @UseGuards(AuthGuard)
-@Controller("tasks")
-export class TasksController {
-  constructor(private readonly taskService: TasksService) {}
+@Controller("columns")
+export class ColumnsController {
+  constructor(private readonly columnService: ColumnsService) {}
 
   @Get()
   async getAll(@Query() query: QueryDto) {
-    return this.taskService.findAll(query);
+    return this.columnService.findAll(query);
   }
 
-  @Get("inbox")
-  async getAllByUserInbox(
+  @Get("board/:boardId")
+  async getAllByBoardId(
+    @Param("boardId", new CustomParseUUIDPipe()) boardId: string,
     @Query() query: QueryDto,
-    @User("userId") userId: string,
   ) {
-    return this.taskService.findAllByUserInbox(query, userId);
+    return this.columnService.findAllByBoardId(boardId, query);
   }
 
   @Get(":id")
   async getOne(@Param("id", new CustomParseUUIDPipe()) id: string) {
-    return this.taskService.findOne(id);
+    return this.columnService.findOne(id);
   }
 
   @Post("create")
-  async create(@Body() body: CreateTaskDto, @User("userId") userId: string) {
+  async create(@Body() body: CreateColumnDto, @User("userId") userId: string) {
     return {
-      task: await this.taskService.create(body, userId),
-      message: "Tạo công việc thành công",
+      message: "Tạo cột thành công",
+      column: await this.columnService.create(body, userId),
     };
   }
 
   @Put("switch-position/:id")
   async switchPosition(
-    @Body() body: SwitchPositionTaskDto,
+    @Body() body: SwitchPositionColumnDto,
     @Param("id", new CustomParseUUIDPipe()) id: string,
   ) {
-    return this.taskService.switchPosition(id, body);
+    return this.columnService.switchPosition(id, body);
   }
 
   @Put("update/:id")
   async update(
     @Param("id", new CustomParseUUIDPipe()) id: string,
-    @Body() body: Partial<CreateTaskDto>,
+    @Body() body: Partial<CreateColumnDto>,
   ) {
-    return this.taskService.update(id, body);
+    return {
+      message: "Cập nhật cột thành công",
+      column: await this.columnService.update(id, body),
+    };
   }
 
   @Delete("remove/:id")
   async softRemove(@Param("id", new CustomParseUUIDPipe()) id: string) {
-    return this.taskService.softRemove(id);
+    return this.columnService.softRemove(id);
   }
 
   @Put("restore/:id")
   async restore(@Param("id", new CustomParseUUIDPipe()) id: string) {
-    return this.taskService.restore(id);
+    return this.columnService.restore(id);
   }
 
   @Delete("delete/:id")
   async delete(@Param("id", new CustomParseUUIDPipe()) id: string) {
-    return this.taskService.delete(id);
+    return this.columnService.delete(id);
   }
 }

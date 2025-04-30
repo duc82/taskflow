@@ -1,9 +1,10 @@
 import {
   BaseEntity,
-  Column,
+  Column as ColumnTypeorm,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -11,31 +12,39 @@ import {
 import { BoardVisibility } from "../boards.enum";
 import { Task } from "src/tasks/entities/tasks.entity";
 import { BoardMember } from "./board_members.entity";
+import { User } from "src/users/entities/users.entity";
+import { Column } from "src/columns/columns.entity";
 
 @Entity("boards")
 export class Board extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column()
+  @ColumnTypeorm()
   title: string;
 
-  @Column({
+  @ColumnTypeorm({
     nullable: true,
+    default: "rgb(220, 234, 254)",
   })
   cover: string;
 
-  @Column({
+  @ColumnTypeorm({
     nullable: true,
   })
   coverColor: string;
 
-  @Column({
+  @ColumnTypeorm({
     type: "enum",
     enum: BoardVisibility,
-    default: BoardVisibility.WORKSPACE,
+    default: BoardVisibility.PRIVATE,
   })
   visibility: BoardVisibility;
+
+  @ManyToOne(() => User, (user) => user.boards, {
+    onDelete: "CASCADE",
+  })
+  owner: User;
 
   @OneToMany(() => Task, (task) => task.board, {
     cascade: true,
@@ -46,6 +55,11 @@ export class Board extends BaseEntity {
     cascade: true,
   })
   members: BoardMember[];
+
+  @OneToMany(() => Column, (column) => column.board, {
+    cascade: true,
+  })
+  columns: Column[];
 
   @DeleteDateColumn({
     type: "timestamptz",

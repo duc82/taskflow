@@ -1,7 +1,7 @@
 import { User } from "src/users/entities/users.entity";
 import {
   BaseEntity,
-  Column,
+  Column as ColumnTypeorm,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -10,43 +10,47 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Category } from "src/categories/categories.entity";
 import { TaskComment } from "./task_comments.entity";
 import { Board } from "src/boards/entities/boards.entity";
 import { TaskAttachment } from "./task_attachments.entity";
 import { TaskActivity } from "./task_activities.entity";
 import { TaskLabel } from "./task_labels.entity";
-import { Archive } from "src/archives/archives.entity";
+import { Column } from "src/columns/columns.entity";
 
 @Entity("tasks")
 export class Task extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column()
+  @ColumnTypeorm()
   title: string;
 
-  @Column({ type: "text", nullable: true })
+  @ColumnTypeorm({
+    type: "double precision",
+  })
+  position: number;
+
+  @ColumnTypeorm({ type: "text", nullable: true })
   description: string;
 
-  @Column({
+  @ColumnTypeorm({
     type: "boolean",
     default: false,
   })
   isCompleted: boolean;
 
-  @Column({
+  @ColumnTypeorm({
     type: "boolean",
     default: false,
   })
   isWatching: boolean;
 
-  @Column({
+  @ColumnTypeorm({
     nullable: true,
   })
   cover: string;
 
-  @Column({
+  @ColumnTypeorm({
     nullable: true,
   })
   coverColor: string;
@@ -54,16 +58,11 @@ export class Task extends BaseEntity {
   @ManyToOne(() => User, (user) => user.tasks, { onDelete: "CASCADE" })
   user: User;
 
-  @ManyToOne(() => Category, (category) => category.tasks, {
+  @ManyToOne(() => Column, (column) => column.tasks, {
     nullable: true,
     onDelete: "CASCADE",
   })
-  category: Category;
-
-  @ManyToOne(() => Archive, (archive) => archive.tasks, {
-    onDelete: "CASCADE",
-  })
-  archive: Archive;
+  column: Column;
 
   @OneToMany(() => TaskComment, (taskComment) => taskComment.task, {
     cascade: true,
@@ -95,10 +94,10 @@ export class Task extends BaseEntity {
   })
   userInbox: User;
 
-  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @ColumnTypeorm({ type: "timestamptz", nullable: true })
   startDate: Date;
 
-  @Column({ type: "timestamptz", nullable: true })
+  @ColumnTypeorm({ type: "timestamptz", nullable: true })
   dueDate: Date;
 
   @DeleteDateColumn({

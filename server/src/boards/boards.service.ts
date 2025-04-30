@@ -4,29 +4,30 @@ import { Board } from "./entities/boards.entity";
 import { CreateBoardDto } from "./boards.dto";
 import { QueryDto } from "src/dtos/query.dto";
 import { BoardMember } from "./entities/board_members.entity";
-import { MemberRole } from "./boards.enum";
-import { UsersService } from "src/users/users.service";
 import { UserPayload } from "src/users/users.interface";
 import { UserRole } from "src/users/users.enum";
+import { MemberRole } from "./boards.enum";
 
 @Injectable()
 export class BoardsService {
   private readonly boardRepository = this.dataSource.getRepository(Board);
 
-  constructor(
-    private userService: UsersService,
-    private dataSource: DataSource,
-  ) {}
+  constructor(private dataSource: DataSource) {}
 
-  async create(body: CreateBoardDto, userId: string) {
-    const user = await this.userService.findOne(userId);
+  async create(body: CreateBoardDto) {
+    const { userId, ...rest } = body;
 
     const newMember = this.dataSource.getRepository(BoardMember).create({
       role: MemberRole.ADMIN,
-      user,
+      user: {
+        id: userId,
+      },
     });
 
-    const newBoard = this.boardRepository.create(body);
+    const newBoard = this.boardRepository.create({
+      ...rest,
+      owner: { id: userId },
+    });
     newBoard.members = [newMember];
 
     await this.boardRepository.save(newBoard);
@@ -51,9 +52,6 @@ export class BoardsService {
       },
       take: limit,
       skip,
-      order: {
-        createdAt: "DESC",
-      },
     });
 
     return {
@@ -67,7 +65,21 @@ export class BoardsService {
   async findOne(id: string) {
     const board = await this.boardRepository.findOne({
       where: { id },
-      relations: ["tasks", "members", "members.user"],
+      relations: [
+        "columns",
+        "columns.tasks",
+        "columns.tasks.column",
+        "members",
+        "members.user",
+      ],
+      order: {
+        columns: {
+          position: "ASC",
+          tasks: {
+            position: "ASC",
+          },
+        },
+      },
     });
 
     if (!board) {

@@ -16,6 +16,7 @@ import { CustomParseUUIDPipe } from "src/pipes/CustomParseUUIDPipe.pipe";
 import { User } from "src/decorators/user.decorator";
 import { UserPayload } from "src/users/users.interface";
 import { AuthGuard } from "src/guards/auth.guard";
+import { UserRole } from "src/users/users.enum";
 
 @UseGuards(AuthGuard)
 @Controller("boards")
@@ -23,9 +24,13 @@ export class BoardsController {
   constructor(private readonly boardService: BoardsService) {}
 
   @Post("create")
-  async create(@Body() body: CreateBoardDto, @User("userId") userId: string) {
+  async create(@Body() body: CreateBoardDto, @User() userPayload: UserPayload) {
+    if (userPayload.role === UserRole.USER) {
+      body.userId = userPayload.userId;
+    }
+
     return {
-      board: await this.boardService.create(body, userId),
+      board: await this.boardService.create(body),
       message: "Tạo bảng thành công",
     };
   }

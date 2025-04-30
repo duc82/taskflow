@@ -5,16 +5,15 @@ import { AppService } from "./app.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { UsersModule } from "./users/users.module";
 import { TasksModule } from "./tasks/tasks.module";
-import { CategoriesModule } from "./categories/categories.module";
 import { AuthModule } from "./auth/auth.module";
 import { JwtGlobalModule } from "./jwt/jwt.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { MailerModule } from "./mailer/mailer.module";
 import { google } from "googleapis";
 import { BoardsModule } from "./boards/boards.module";
-import { ArchivesModule } from "./archives/archives.module";
 import { AvatarModule } from "./avatar/avatar.module";
 import { CloudinaryModule } from "./cloudinary/cloudinary.module";
+import { ColumnsModule } from "./columns/columns.module";
 const OAuth2 = google.auth.OAuth2;
 
 @Module({
@@ -96,11 +95,10 @@ const OAuth2 = google.auth.OAuth2;
     JwtGlobalModule,
     UsersModule,
     TasksModule,
-    CategoriesModule,
+    ColumnsModule,
     AuthModule,
     MailerModule,
     BoardsModule,
-    ArchivesModule,
     AvatarModule,
   ],
   controllers: [AppController],

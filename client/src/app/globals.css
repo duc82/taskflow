@@ -11,7 +11,7 @@
 
 @layer base {
   html {
-    @apply overflow-auto! p-0!;
+    @apply p-0!;
   }
 
   body {
@@ -21,4 +21,22 @@
   button {
     @apply cursor-pointer;
   }
+
+  ul,
+  ol,
+  li {
+    @apply list-none!;
+  }
+}
+
+#board::-webkit-scrollbar {
+  @apply size-2.5;
+}
+
+#board::-webkit-scrollbar-thumb {
+  @apply bg-gray-100/40 hover:bg-gray-100/70 rounded-full;
+}
+
+#board::-webkit-scrollbar-track {
+  @apply bg-gray-900/30 rounded-full;
 }

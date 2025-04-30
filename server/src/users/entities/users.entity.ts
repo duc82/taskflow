@@ -3,7 +3,7 @@ import {
   BaseEntity,
   BeforeInsert,
   BeforeUpdate,
-  Column,
+  Column as ColumnTypeorm,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -16,12 +16,13 @@ import {
 } from "typeorm";
 import { UserRole } from "../users.enum";
 import { Task } from "src/tasks/entities/tasks.entity";
-import { Category } from "src/categories/categories.entity";
 import { TaskComment } from "src/tasks/entities/task_comments.entity";
 import { UserToken } from "./user_tokens.entity";
 import * as bcrypt from "bcrypt";
 import { BoardMember } from "src/boards/entities/board_members.entity";
 import { TaskActivity } from "src/tasks/entities/task_activities.entity";
+import { Board } from "src/boards/entities/boards.entity";
+import { Column } from "src/columns/columns.entity";
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -34,39 +35,33 @@ export class User extends BaseEntity {
   id: string;
 
   @Index("idx_users_email", { unique: true })
-  @Column()
+  @ColumnTypeorm()
   email: string;
 
-  @Column()
+  @ColumnTypeorm()
   name: string;
 
-  @Column()
+  @ColumnTypeorm()
   avatar: string;
 
-  @Column()
+  @ColumnTypeorm()
   @Exclude()
   password: string;
 
-  @Column({
+  @ColumnTypeorm({
     type: "enum",
     enum: UserRole,
     default: UserRole.USER,
   })
   role: UserRole;
 
-  @OneToMany(() => Task, (task) => task.user, {
-    cascade: true,
-  })
+  @OneToMany(() => Task, (task) => task.user)
   tasks: Task[];
 
-  @OneToMany(() => Category, (category) => category.user, {
-    cascade: true,
-  })
-  categories: Category[];
+  @OneToMany(() => Column, (column) => column.user)
+  columns: Column[];
 
-  @OneToMany(() => TaskComment, (taskComment) => taskComment.user, {
-    cascade: true,
-  })
+  @OneToMany(() => TaskComment, (taskComment) => taskComment.user)
   taskComments: TaskComment[];
 
   @OneToOne(() => UserToken, {
@@ -79,15 +74,14 @@ export class User extends BaseEntity {
   @OneToMany(() => BoardMember, (boardMember) => boardMember.user)
   boardMembers: BoardMember[];
 
-  @OneToMany(() => TaskActivity, (taskActivity) => taskActivity.user, {
-    cascade: true,
-  })
+  @OneToMany(() => TaskActivity, (taskActivity) => taskActivity.user)
   taskActivities: TaskActivity[];
 
-  @OneToMany(() => Task, (task) => task.userInbox, {
-    cascade: true,
-  })
+  @OneToMany(() => Task, (task) => task.userInbox)
   inboxes: Task[];
+
+  @OneToMany(() => Board, (board) => board.owner)
+  boards: Board[];
 
   @DeleteDateColumn({
     type: "timestamptz",

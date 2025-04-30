@@ -9,7 +9,7 @@ import {
 import boardDecoration from "@/app/assets/board.svg";
 import Image from "next/image";
 import { useForm, Controller } from "react-hook-form";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BoardDto, boardSchema } from "@/app/schemas/board.schema";
 import Select from "react-select";
@@ -22,6 +22,7 @@ import fetchAuth from "@/app/libs/fetchAuth";
 import { useRouter } from "next/navigation";
 import Spinner from "../Spinner";
 import { UnplashImageURL } from "@/app/libs/unplash";
+import useDisableKeyboardModal from "@/app/hooks/useDisableKeyboardModal";
 
 export default function CreateBoardModal({
   unplashImages,
@@ -31,6 +32,8 @@ export default function CreateBoardModal({
   setBoards: Dispatch<SetStateAction<Board[]>>;
 }) {
   const router = useRouter();
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useDisableKeyboardModal();
 
   const {
     register,
@@ -47,7 +50,7 @@ export default function CreateBoardModal({
         unplashImages.length > 0
           ? `${unplashImages[0].raw}&q=40&auto=compress&fm=webp&w=2560`
           : "",
-      visibility: "workspace",
+      visibility: "private",
     },
   });
 
@@ -58,43 +61,24 @@ export default function CreateBoardModal({
         body: JSON.stringify(data),
       });
       setBoards((prev) => [board, ...prev]);
+      closeRef.current?.click();
       router.push(`/cong-viec/${board.id}`);
     } catch (error) {
       toast.error(formatError(error));
     }
   };
 
-  useEffect(() => {
-    const handleKeydown = (e: KeyboardEvent) => {
-      const allowedHeadlessUIKeys = [
-        "ArrowUp",
-        "ArrowDown",
-        "Enter",
-        " ", // Space Key
-        "Home",
-        "End",
-        "Escape",
-      ];
-      if (allowedHeadlessUIKeys.includes(e.key)) {
-        e.stopPropagation();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeydown, true);
-    return () => {
-      window.removeEventListener("keydown", handleKeydown, true);
-    };
-  }, []);
-
   const options = [
     { value: "private", label: "Riêng tư" },
-    { value: "workspace", label: "Không gian làm việc" },
     { value: "public", label: "Công khai" },
   ];
 
   return (
     <Menu>
-      <MenuButton className="bg-gray-100 h-[calc(96px+40px)] shadow-raised rounded-lg p-4 flex flex-col items-center justify-center hover:bg-gray-200 hover:shadow-none">
+      <MenuButton
+        ref={closeRef}
+        className="bg-gray-100 h-[calc(96px+40px)] shadow-raised rounded-lg p-4 flex flex-col items-center justify-center hover:bg-gray-200 hover:shadow-none"
+      >
         <span className="text-gray-600 text-sm">Tạo bảng mới</span>
       </MenuButton>
       <MenuItems

@@ -7,13 +7,11 @@ import { JwtService, JwtSignOptions, JwtVerifyOptions } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
 import { DataSource } from "typeorm";
 import { SignInDto, SignUpDto } from "./auth.dto";
-import { UserRole } from "src/users/users.enum";
 import { UserPayload } from "src/users/users.interface";
 import { ConfigService } from "@nestjs/config";
 import { UserToken } from "src/users/entities/user_tokens.entity";
 import { MailerService } from "src/mailer/mailer.service";
 import { Response } from "express";
-import { AvatarService } from "src/avatar/avatar.service";
 
 @Injectable()
 export class AuthService {
@@ -36,10 +34,7 @@ export class AuthService {
     private dataSource: DataSource,
   ) {}
 
-  async generateToken(
-    payload: { userId: string; role: UserRole },
-    options?: JwtSignOptions,
-  ) {
+  async generateToken(payload: UserPayload, options?: JwtSignOptions) {
     return this.jwtService.signAsync(payload, options);
   }
 
@@ -77,15 +72,16 @@ export class AuthService {
       role: user.role,
     };
 
-    const accessToken = await this.generateToken(payload, {
-      expiresIn: this.accessExpiration / 1000,
-      secret: this.accessSecret,
-    });
-
-    const refreshToken = await this.generateToken(payload, {
-      expiresIn: this.refreshExpiration / 1000,
-      secret: this.refreshSecret,
-    });
+    const [accessToken, refreshToken] = await Promise.all([
+      this.generateToken(payload, {
+        expiresIn: this.accessExpiration / 1000,
+        secret: this.accessSecret,
+      }),
+      this.generateToken(payload, {
+        expiresIn: this.refreshExpiration / 1000,
+        secret: this.refreshSecret,
+      }),
+    ]);
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,

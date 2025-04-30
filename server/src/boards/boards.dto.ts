@@ -1,5 +1,4 @@
 import {
-  IsArray,
   IsEnum,
   IsNotEmpty,
   IsString,
@@ -25,4 +24,10 @@ export class CreateBoardDto {
 
   @IsEnum(BoardVisibility)
   visibility: BoardVisibility;
+
+  @ValidateIf((o) => o.userId)
+  @IsUUID(4, {
+    message: "User ID không hợp lệ",
+  })
+  userId?: string;
 }

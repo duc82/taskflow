@@ -1,8 +1,9 @@
 import {
+  IsBoolean,
   IsDateString,
-  IsEnum,
   IsNotEmpty,
   IsString,
+  IsUUID,
   ValidateIf,
 } from "class-validator";
 
@@ -12,36 +13,65 @@ export class CreateTaskDto {
   })
   title: string;
 
+  @ValidateIf((o) => o.description)
   @IsString()
-  description: string;
+  description?: string;
 
-  @IsNotEmpty({
-    message: "Ngày hết hạn không được để trống",
+  @IsBoolean({
+    message: "Trạng thái hoàn thành không hợp lệ",
   })
+  isCompleted: boolean;
+
+  @IsBoolean({
+    message: "Trạng thái theo dõi không hợp lệ",
+  })
+  isWatching: boolean;
+
+  @ValidateIf((o) => o.cover)
+  @IsString()
+  cover?: string;
+
+  @ValidateIf((o) => o.coverColor)
+  @IsString()
+  coverColor?: string;
+
+  @ValidateIf((o) => o.startDate)
+  @IsDateString(
+    {},
+    {
+      message: "Ngày bắt đầu không hợp lệ",
+    },
+  )
+  startDate?: Date;
+
+  @ValidateIf((o) => o.dueDate)
   @IsDateString(
     {},
     {
       message: "Ngày hết hạn không hợp lệ",
     },
   )
-  dueDate: Date;
+  dueDate?: Date;
 
-  @IsNotEmpty({
-    message: "Tiến độ không được để trống",
+  @ValidateIf((o) => o.columnId)
+  @IsUUID(4, {
+    message: "Column ID không hợp lệ",
   })
-  progress: number;
+  columnId?: string;
 
-  @IsNotEmpty({
-    message: "Người dùng không được để trống",
+  @ValidateIf((o) => o.boardId)
+  @IsUUID(4, {
+    message: "Board ID không hợp lệ",
   })
-  userId: string;
+  boardId?: string;
+}
 
-  @IsNotEmpty({
-    message: "Danh mục không được để trống",
-  })
-  categoryId: string;
+export class SwitchPositionTaskDto {
+  @ValidateIf((o) => o.beforeTaskId)
+  @IsUUID(4)
+  beforeTaskId?: string;
 
-  @ValidateIf((o) => !o.organizationId)
-  @IsString()
-  organizationId?: string;
+  @ValidateIf((o) => o.afterTaskId)
+  @IsUUID(4)
+  afterTaskId?: string;
 }

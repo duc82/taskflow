@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     "Dễ dàng quản lý công việc, đánh giá mức độ hoàn thành công việc của cá nhân, nhóm và doanh nghiệp.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
