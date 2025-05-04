@@ -9,7 +9,7 @@ export const taskSchema = z.object({
   coverColor: z.string().optional(),
   startDate: z.date().optional(),
   dueDate: z.date().optional(),
-  categoryId: z.string().optional(),
+  columnId: z.string().optional(),
   boardId: z.string().optional(),
 });
 

@@ -1,7 +1,15 @@
-const dark = "#364153";
-const light = "white";
+const contrasts = {
+  dark: {
+    background: "#ffffff3d",
+    color: "#101828",
+  },
+  light: {
+    background: "#0000003d",
+    color: "white",
+  },
+};
 
-function getContrastColorFromRGB(rgbStr: string): string {
+function getContrastColorFromRGB(rgbStr: string): "light" | "dark" {
   const match = rgbStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
 
   if (!match) {
@@ -15,10 +23,10 @@ function getContrastColorFromRGB(rgbStr: string): string {
   // Calculate brightness using standard formula
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
 
-  return brightness > 128 ? dark : light;
+  return brightness > 128 ? "dark" : "light";
 }
 
-function getContrastColorFromImage(url: string): Promise<string> {
+function getContrastColorFromImage(url: string): Promise<"light" | "dark"> {
   return new Promise((resolve) => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -52,12 +60,12 @@ function getContrastColorFromImage(url: string): Promise<string> {
         b = Math.floor(b / count);
 
         const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-        resolve(brightness > 128 ? dark : light);
+        resolve(brightness > 128 ? "dark" : "light");
       } else {
-        resolve(dark); // Fallback
+        resolve("dark"); // Fallback
       }
     };
   });
 }
 
-export { getContrastColorFromRGB, getContrastColorFromImage };
+export { getContrastColorFromRGB, getContrastColorFromImage, contrasts };

@@ -30,7 +30,7 @@ import {
   EllipsisHorizontalIcon,
   InboxStackIcon,
 } from "@heroicons/react/24/solid";
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useRef, useState } from "react";
 import TextArea from "../TextArea";
 import TaskCard from "../Task/TaskCard";
 import ColumnContainer from "../Column/ColumnContainer";
@@ -46,6 +46,7 @@ import useClickOutside from "@/app/hooks/useClickOutside";
 import useBodyOverflow from "@/app/hooks/useBodyOverflow";
 import { ColumnDto } from "@/app/schemas/column.schema";
 import { Column, ColumnResponse } from "@/app/types/column";
+import { contrasts } from "@/app/utils/getContrastColor";
 
 type Items = Record<string, Task[]>;
 
@@ -68,9 +69,10 @@ export default function BoardContent({
     Inbox: taskInboxRes.tasks,
     ...convertToItems(board.columns),
   });
-  const [containers, setContainers] = useState<UniqueIdentifier[]>(
-    Object.keys(items)
-  );
+  const [containers, setContainers] = useState<UniqueIdentifier[]>([
+    "Inbox",
+    ...board.columns.map((column) => column.title),
+  ]);
   // State to manage the active column and task during drag and drop
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   // State to manage add mode
@@ -78,9 +80,10 @@ export default function BoardContent({
     inbox: false,
     column: false,
   });
+  const [isEditHeader, setIsEditHeader] = useState(false);
   // State to manage the submission state
   const [isSubmiting, setIsSubmiting] = useState(false);
-  // Custom hook to handle click outside of the inbox form
+  // Custom hook to handle click outside of the form
   const { containerRef: inboxFormRef } = useClickOutside<HTMLFormElement>({
     enable: addMode.inbox,
     cb: () => setAddMode((prev) => ({ ...prev, inbox: false })),
@@ -89,10 +92,14 @@ export default function BoardContent({
     enable: addMode.column,
     cb: () => setAddMode((prev) => ({ ...prev, column: false })),
   });
+  const { containerRef: editFormRef } = useClickOutside<HTMLFormElement>({
+    enable: isEditHeader,
+    cb: () => setIsEditHeader(false),
+  });
   // Check if the component is mounted to avoid document is not defined error
   const isMounted = useMount();
   // Get dynamic color based on the board background
-  const dynamicColor = useColor(board);
+  const contrast = useColor(board);
   // Handle scroll by dragging
   const { containerRef, handleMouseDown, handleTouchStart } =
     useScrollByDragging<HTMLUListElement>();
@@ -173,14 +180,24 @@ export default function BoardContent({
     e.preventDefault();
 
     const target = e.target as HTMLFormElement;
+    const inboxTitle = target.inboxTitle?.value;
+    const taskTitle = target.taskTitle?.value;
 
     try {
       setIsSubmiting(true);
       const data: TaskDto = {
-        title: target.inboxTitle.value,
+        title: inboxTitle || taskTitle,
         isCompleted: false,
         isWatching: false,
       };
+
+      if (taskTitle) {
+        const columnId = board.columns.find(
+          (column) => column.title === target.columnTitle?.value
+        )?.id;
+        data.boardId = board.id;
+        data.columnId = columnId;
+      }
 
       const { task } = await fetchAuth<TaskReponse>("/tasks/create", {
         method: "POST",
@@ -189,7 +206,16 @@ export default function BoardContent({
 
       setItems((prevItems) => {
         const newItems = { ...prevItems };
-        newItems.Inbox = [task, ...newItems.Inbox];
+        const columnTitle = board.columns.find(
+          (column) => column.id === task.column?.id
+        )?.title;
+
+        if (columnTitle) {
+          newItems[columnTitle] = [...newItems[columnTitle], task];
+        } else {
+          newItems.Inbox = [task, ...newItems.Inbox];
+        }
+
         return newItems;
       });
 
@@ -209,7 +235,7 @@ export default function BoardContent({
     try {
       setIsSubmiting(true);
       const data: ColumnDto = {
-        title: target.columnTitle.value,
+        title: target.columnTitle.value.trim(),
         boardId: board.id,
       };
 
@@ -267,10 +293,12 @@ export default function BoardContent({
     taskId,
     beforeTaskId,
     afterTaskId,
+    columnId,
   }: {
     taskId: string;
     beforeTaskId?: string;
     afterTaskId?: string;
+    columnId?: string;
   }) => {
     try {
       await fetchAuth<{ message: string }>(`/tasks/switch-position/${taskId}`, {
@@ -278,6 +306,8 @@ export default function BoardContent({
         body: JSON.stringify({
           beforeTaskId,
           afterTaskId,
+          columnId,
+          boardId: columnId ? board.id : null,
         }),
       });
     } catch (error) {
@@ -324,12 +354,11 @@ export default function BoardContent({
   const onDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id);
   };
+
   const onDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
     const activeId = active.id;
     const overId = over?.id;
-
-    console.log({ activeId, overId });
 
     if (!overId || activeId in items) return;
 
@@ -385,6 +414,7 @@ export default function BoardContent({
       });
     }
   };
+
   const onDragEnd = async (event: DragEndEvent) => {
     setActiveId(null);
 
@@ -392,7 +422,9 @@ export default function BoardContent({
     const activeId = active.id;
     const overId = over?.id;
 
-    if (activeId in items && overId) {
+    if (!overId) return;
+
+    if (activeId in items && activeId !== overId) {
       const activeIndex = containers.indexOf(activeId);
       const overIndex = containers.indexOf(overId);
 
@@ -418,52 +450,58 @@ export default function BoardContent({
         beforeColumnId,
         afterColumnId,
       });
-    }
-
-    const activeContainer = findContainer(activeId);
-
-    if (!overId || !activeContainer) {
       return;
     }
 
+    const activeContainer = findContainer(activeId);
     const overContainer = findContainer(overId);
 
-    if (overContainer) {
-      const activeIndex = items[activeContainer].findIndex(
-        (task) => task.id === activeId
-      );
-      const overIndex = items[overContainer].findIndex(
-        (task) => task.id === overId
-      );
+    if (!activeContainer || !overContainer) {
+      return;
+    }
 
-      if (activeIndex !== overIndex) {
-        const newItems = {
-          ...items,
-          [overContainer]: arrayMove(
-            items[overContainer],
-            activeIndex,
-            overIndex
-          ),
-        };
-        setItems(newItems);
+    const activeIndex = items[activeContainer].findIndex(
+      (task) => task.id === activeId
+    );
+    const overIndex = items[overContainer].findIndex(
+      (task) => task.id === overId
+    );
+    const isMovedToNewContainer = recentlyMovedToNewContainer.current;
 
-        const taskId = newItems[overContainer][overIndex].id;
-        const beforeTaskId = newItems[overContainer][overIndex - 1].id;
-        const afterTaskId = newItems[overContainer][overIndex + 1].id;
+    if (activeId !== overId || isMovedToNewContainer) {
+      const newItems = {
+        ...items,
+        [overContainer]: arrayMove(
+          items[overContainer],
+          activeIndex,
+          overIndex
+        ),
+      };
+      setItems(newItems);
 
-        await switchPositionTask({ taskId, beforeTaskId, afterTaskId });
+      if (isMovedToNewContainer) {
+        recentlyMovedToNewContainer.current = false;
       }
+
+      const taskId = newItems[overContainer][overIndex]?.id;
+      const beforeTaskId = newItems[overContainer][overIndex - 1]?.id;
+      const afterTaskId = newItems[overContainer][overIndex + 1]?.id;
+      const columnId = board.columns.find(
+        (column) => column.title === overContainer
+      )?.id;
+
+      await switchPositionTask({
+        taskId,
+        beforeTaskId,
+        afterTaskId,
+        columnId,
+      });
     }
   };
+
   const onDragCancel = () => {
     setActiveId(null);
   };
-
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      recentlyMovedToNewContainer.current = false;
-    });
-  }, [items]);
 
   const containersWithoutInbox = containers.filter(
     (container) => container !== "Inbox"
@@ -564,14 +602,38 @@ export default function BoardContent({
             style={{
               backgroundColor: board?.coverColor || "",
               backgroundImage: `url(${board.cover})`,
-              color: dynamicColor,
             }}
           >
-            <div className="bg-[#0000003d] backdrop-blur-[6px] rounded-t-lg">
+            <div
+              className="backdrop-blur-[6px] rounded-t-lg"
+              style={contrasts[contrast]}
+            >
               <div className="flex justify-between relative flex-wrap items-center p-3 gap-1">
-                <div>
-                  <h1>{board.title}</h1>
-                </div>
+                <form ref={editFormRef}>
+                  <div
+                    className="cursor-pointer h-8"
+                    onClick={() => setIsEditHeader(true)}
+                  >
+                    {!isEditHeader && (
+                      <h1 className="px-2.5 leading-8 font-semibold">
+                        {board.title}
+                      </h1>
+                    )}
+                    {isEditHeader && (
+                      <>
+                        <label htmlFor="boardTitle"></label>
+                        <input
+                          type="text"
+                          name="boardTitle"
+                          id="boardTitle"
+                          defaultValue={board.title}
+                          className="hidden"
+                        />
+                      </>
+                    )}
+                  </div>
+                </form>
+                <div className="flex items-center"></div>
               </div>
             </div>
             <div className="flex-grow-1 overflow-y-hidden">
@@ -591,6 +653,7 @@ export default function BoardContent({
                       key={container}
                       tasks={items[container]}
                       columnId={container}
+                      addTask={handleAddTask}
                       updateTask={updateTask}
                       deleteTask={deleteTask}
                     />
@@ -668,6 +731,7 @@ export default function BoardContent({
                     <ColumnContainer
                       tasks={items[activeId]}
                       columnId={activeId}
+                      addTask={handleAddTask}
                       updateTask={updateTask}
                       deleteTask={deleteTask}
                     />
@@ -680,6 +744,7 @@ export default function BoardContent({
                       }
                       updateTask={updateTask}
                       deleteTask={deleteTask}
+                      isOverlay={true}
                     />
                   )}
                 </>

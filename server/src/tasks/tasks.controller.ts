@@ -51,8 +51,9 @@ export class TasksController {
   async switchPosition(
     @Body() body: SwitchPositionTaskDto,
     @Param("id", new CustomParseUUIDPipe()) id: string,
+    @User("userId") userId: string,
   ) {
-    return this.taskService.switchPosition(id, body);
+    return this.taskService.switchPosition(id, body, userId);
   }
 
   @Put("update/:id")

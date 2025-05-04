@@ -10,6 +10,7 @@ import {
   CheckIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
+import { useState } from "react";
 
 export default function EditTaskModal({
   isOpen,
@@ -23,6 +24,7 @@ export default function EditTaskModal({
   onUpdate: (id: string, task: Partial<Task>) => void;
 }) {
   const isMounted = useMount();
+  const [isEditing, setIsEditing] = useState(false);
 
   if (!isOpen || !isMounted) return null;
 
@@ -105,12 +107,17 @@ export default function EditTaskModal({
                 )}
                 {!task.description && (
                   <>
-                    <button
-                      type="button"
-                      className="pt-2 px-3 pb-8 text-left rounded-sm bg-gray-200 font-medium block w-full text-gray-800 hover:bg-gray-300"
-                    >
-                      Thêm mô tả chi tiết hơn...
-                    </button>
+                    {!isEditing ? (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditing(true)}
+                        className="pt-2 px-3 pb-8 text-left rounded-sm bg-gray-200 font-medium block w-full text-gray-800 hover:bg-gray-300"
+                      >
+                        Thêm mô tả chi tiết hơn...
+                      </button>
+                    ) : (
+                      <div></div>
+                    )}
                   </>
                 )}
               </div>

@@ -9,8 +9,6 @@ export default function TextArea(
   const resizeTextarea = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = e.target;
 
-    console.log(textarea.scrollHeight);
-
     if (textarea) {
       textarea.style.height = (props.style?.minHeight as string) || "auto"; // reset to shrink if needed
       textarea.style.height = `${textarea.scrollHeight}px`; // set to scrollHeight

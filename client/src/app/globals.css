@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @plugin "@tailwindcss/forms";
+
+@plugin "tailwindcss-animate";
+
+@plugin "tailwind-scrollbar-hide";
 
 @theme {
   --background-image-board: url(https://images.unsplash.com/photo-1742156345582-b857d994c84e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MDY2fDB8MXxjb2xsZWN0aW9ufDF8MzE3MDk5fHx8fHwyfHwxNzQ0Nzg4MTg5fA&ixlib=rb-4.0.3&q=80&w=400&quot;);

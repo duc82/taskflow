@@ -8,16 +8,17 @@ import clsx from "clsx";
 import { MouseEvent, useState } from "react";
 import EditTaskModal from "./EditTaskModal";
 import useMount from "@/app/hooks/useMount";
-import { Column } from "@/app/types/column";
 
 export default function TaskCard({
   task,
   updateTask,
   deleteTask,
+  isOverlay = false,
 }: {
   task: Task;
   updateTask: (id: string, task: Partial<Task>) => void;
   deleteTask: (id: string) => void;
+  isOverlay?: boolean;
 }) {
   const isMounted = useMount();
   const [isOpen, setIsOpen] = useState(false);
@@ -75,31 +76,37 @@ export default function TaskCard({
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <input
-              type="checkbox"
-              name="isCompleted"
-              id={task.title}
-              defaultChecked={task.isCompleted}
-              className={clsx(
-                "mr-1 p-0.5 rounded-full cursor-pointer text-green-700 focus:ring-0 focus:outline-0 focus:shadow-none transition-opacity duration-300 ease-in",
-                !task.isCompleted &&
-                  "opacity-0 group-hover/completed:opacity-100"
-              )}
-              title="Đánh dấu hoàn tất"
-            />
-            <span
-              className={clsx(
-                "transition-transform duration-300 ease-in",
-                !task.isCompleted &&
-                  "-translate-x-5 group-hover/completed:translate-x-0"
-              )}
-            >
-              {task.title}
-            </span>
+            {!isOverlay && !isDragging && (
+              <input
+                type="checkbox"
+                name="isCompleted"
+                id={task.title}
+                defaultChecked={task.isCompleted}
+                className={clsx(
+                  "mr-1 p-0.5 rounded-full cursor-pointer text-green-700 focus:ring-0 focus:outline-0 focus:shadow-none transition-opacity duration-300 ease-in",
+                  !task.isCompleted &&
+                    "opacity-0 group-hover/completed:opacity-100"
+                )}
+                title="Đánh dấu hoàn tất"
+              />
+            )}
+            {isOverlay || isDragging ? (
+              <span>{task.title}</span>
+            ) : (
+              <span
+                className={clsx(
+                  "transition-transform duration-300 ease-in",
+                  !task.isCompleted &&
+                    "-translate-x-5 group-hover/completed:translate-x-0"
+                )}
+              >
+                {task.title}
+              </span>
+            )}
           </div>
-          <button type="button" onClick={() => deleteTask(task.id)}>
+          {/* <button type="button" onClick={() => deleteTask(task.id)}>
             <TrashIcon className="size-4" />
-          </button>
+          </button> */}
         </div>
       </li>
       <EditTaskModal

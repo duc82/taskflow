@@ -9,6 +9,7 @@ import { Reflector } from "@nestjs/core";
 import { ROLES_KEY } from "src/decorators/roles.decorator";
 import { UserRole } from "src/users/users.enum";
 
+// role.guard.ts
 @Injectable()
 export class RoleGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
@@ -31,7 +32,7 @@ export class RoleGuard implements CanActivate {
     }
 
     const hasRole = () =>
-      requiredRoles.some((role) => user.roles?.includes(role));
+      requiredRoles.some((role) => user.roles?.includes(role)); // 'admin' | 'user'
 
     if (!hasRole()) {
       throw new ForbiddenException(

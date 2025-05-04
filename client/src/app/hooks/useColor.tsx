@@ -8,20 +8,21 @@ import {
 } from "../utils/getContrastColor";
 
 export default function useColor(board: Board) {
-  const [dynamicColor, setDynamicColor] = useState<string>("#364153");
+  const [dynamicContrast, setDynamicContrast] = useState<"light" | "dark">(
+    "light"
+  );
 
   useEffect(() => {
     const fetchColor = async () => {
       if (board.cover) {
-        const color = await getContrastColorFromImage(board.cover);
-        setDynamicColor(color);
+        setDynamicContrast(await getContrastColorFromImage(board.cover));
       } else {
-        setDynamicColor(getContrastColorFromRGB(board.coverColor || ""));
+        setDynamicContrast(getContrastColorFromRGB(board.coverColor || ""));
       }
     };
 
     fetchColor();
   }, [board]);
 
-  return dynamicColor;
+  return dynamicContrast;
 }

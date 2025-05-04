@@ -7,30 +7,42 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import TaskCard from "../Task/TaskCard";
-import { useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { Task } from "@/app/types/task";
 import useMount from "@/app/hooks/useMount";
-import { EllipsisHorizontalIcon } from "@heroicons/react/24/solid";
+import {
+  EllipsisHorizontalIcon,
+  PlusIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/solid";
 import TextArea from "../TextArea";
 import useClickOutside from "@/app/hooks/useClickOutside";
 
 export default function ColumnContainer({
   columnId,
   tasks,
+  addTask,
   updateTask,
   deleteTask,
 }: {
   columnId: UniqueIdentifier;
   tasks: Task[];
+  addTask: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   updateTask: (id: string, task: Partial<Task>) => void;
   deleteTask: (taskId: string) => void;
 }) {
   const isMounted = useMount();
   const [isEditing, setIsEditing] = useState(false);
-  const { containerRef } = useClickOutside<HTMLFormElement>({
+  const [isAdding, setIsAdding] = useState(false);
+  const { containerRef: editFormRef } = useClickOutside<HTMLFormElement>({
     enable: isEditing,
     cb: () => setIsEditing(false),
+  });
+
+  const { containerRef: taskFormRef } = useClickOutside<HTMLFormElement>({
+    enable: isAdding,
+    cb: () => setIsAdding(false),
   });
 
   const {
@@ -80,7 +92,7 @@ export default function ColumnContainer({
       <div
         {...headerAttributes}
         className={clsx(
-          "flex flex-col w-72 justify-between rounded-lg bg-gray-200 max-h-full",
+          "flex flex-col w-72 justify-between rounded-lg bg-gray-200 max-h-full pb-2",
           isDragging && "opacity-50"
         )}
       >
@@ -90,13 +102,13 @@ export default function ColumnContainer({
         >
           <div className="flex items-start justify-between w-full">
             {isEditing && (
-              <form className="w-full" ref={containerRef}>
+              <form className="w-full" ref={editFormRef}>
                 <label htmlFor="columnTitle"></label>
                 <TextArea
                   name="columnTitle"
-                  id="columnTitle"
+                  id="editColumnTitle"
                   defaultValue={columnId}
-                  className="block py-1.5 px-3 w-full resize-none rounded-sm font-semibold text-sm leading-5 outline-none border-none ring-2 ring-blue-500"
+                  className="block py-1.5 px-3 w-full resize-none overflow-hidden rounded-sm font-semibold text-sm leading-5 outline-none border-none ring-2 ring-blue-500"
                   maxLength={512}
                   style={{
                     minHeight: "32px",
@@ -136,12 +148,58 @@ export default function ColumnContainer({
               />
             ))}
           </SortableContext>
+          {isAdding && (
+            <li>
+              <form ref={taskFormRef} onSubmit={addTask}>
+                <label htmlFor="taskTitle"></label>
+                <TextArea
+                  name="taskTitle"
+                  id="taskTitle"
+                  className="block w-full text-gray-700 rounded-lg text-sm overflow-hidden outline-none py-2 px-3 shadow-none resize-none border-none ring-2 ring-blue-500"
+                  style={{
+                    height: "56px",
+                    minHeight: "56px",
+                  }}
+                  placeholder="Nhập tiêu đề thẻ"
+                />
+                <input
+                  type="text"
+                  name="columnTitle"
+                  defaultValue={columnId}
+                  readOnly
+                  hidden
+                />
+                <div className="flex items-center mt-2">
+                  <button
+                    type="submit"
+                    className="font-medium px-3 py-1.5 text-sm bg-blue-600 text-white rounded-sm hover:bg-blue-700"
+                  >
+                    Thêm thẻ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsAdding(false)}
+                    className="ml-1 p-1.5 text-gray-900 hover:bg-gray-300 rounded-sm"
+                  >
+                    <XMarkIcon className="size-5" />
+                  </button>
+                </div>
+              </form>
+            </li>
+          )}
         </ul>
-        <div className="p-2 pb-0">
-          <button type="button" className="px-3 py-1.5">
-            <span>Thêm thẻ</span>
-          </button>
-        </div>
+        {!isAdding && (
+          <div className="p-2 pb-0 text-gray-600">
+            <button
+              type="button"
+              onClick={() => setIsAdding(true)}
+              className="px-3 py-1.5 pl-2 flex items-center hover:bg-gray-300 hover:text-gray-700 rounded-lg w-full space-x-2 text-sm font-medium leading-1.5"
+            >
+              <PlusIcon className="size-5" />
+              <span>Thêm thẻ</span>
+            </button>
+          </div>
+        )}
       </div>
     </li>
   );

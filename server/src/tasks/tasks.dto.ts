@@ -74,4 +74,24 @@ export class SwitchPositionTaskDto {
   @ValidateIf((o) => o.afterTaskId)
   @IsUUID(4)
   afterTaskId?: string;
+
+  @ValidateIf((o) => o.columnId)
+  @IsUUID(4)
+  columnId?: string;
+
+  @ValidateIf((o) => o.boardId)
+  @IsUUID(4)
+  boardId?: string;
+}
+
+export class CreateTaskCommentDto {
+  @IsNotEmpty({
+    message: "Nội dung không được để trống",
+  })
+  content: string;
+
+  @IsUUID(4, {
+    message: "Task ID không hợp lệ",
+  })
+  taskId: string;
 }
