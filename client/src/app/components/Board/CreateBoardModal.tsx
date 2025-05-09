@@ -69,15 +69,44 @@ export default function CreateBoardModal({
   };
 
   const options = [
-    { value: "private", label: "Riêng tư" },
-    { value: "public", label: "Công khai" },
+    {
+      value: "private",
+      label: "Riêng tư",
+      description:
+        "Chỉ thành viên bảng thông tin mới có quyền xem bảng thông tin này. Quản trị viên của Không gian làm việc có thể đóng bảng thông tin hoặc xóa thành viên.",
+    },
+    {
+      value: "public",
+      label: "Công khai",
+      description:
+        "Bất kỳ ai trên mạng internet đều có thể xem bảng thông tin này. Chỉ thành viên bảng thông tin mới có quyền sửa.",
+    },
   ];
+
+  const formatOptionLabel = (
+    {
+      label,
+      description,
+    }: {
+      label: string;
+      description: string;
+    },
+    { context }: { context: string }
+  ) => {
+    if (context === "value") return label;
+    return (
+      <div className="flex flex-col cursor-pointer">
+        <span className="text-sm font-medium">{label}</span>
+        <span className="text-xs">{description}</span>
+      </div>
+    );
+  };
 
   return (
     <Menu>
       <MenuButton
         ref={closeRef}
-        className="bg-gray-100 h-[calc(96px+40px)] shadow-raised rounded-lg p-4 flex flex-col items-center justify-center hover:bg-gray-200 hover:shadow-none"
+        className="bg-gray-100 h-[calc(96px+40px)] shadow-raised rounded-lg p-4 flex flex-col items-center justify-center hover:bg-gray-200 hover:shadow-none focus:outline-none"
       >
         <span className="text-gray-600 text-sm">Tạo bảng mới</span>
       </MenuButton>
@@ -254,10 +283,15 @@ export default function CreateBoardModal({
                     menuPosition="fixed"
                     value={options.find((option) => option.value === value)}
                     ref={ref}
+                    formatOptionLabel={formatOptionLabel}
                     onChange={(val) => onChange(val?.value)}
                     options={options}
                     isSearchable={false}
                     styles={{
+                      control: (base) => ({
+                        ...base,
+                        cursor: "pointer",
+                      }),
                       menuPortal: (base) => ({
                         ...base,
                         zIndex: 9999,

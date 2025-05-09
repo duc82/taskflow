@@ -329,7 +329,11 @@ export default function BoardContent({
     });
   };
 
-  const deleteTask = (taskId: string) => {
+  const deleteTask = async (taskId: string) => {
+    await fetchAuth<{ message: string }>(`/tasks/remove/${taskId}`, {
+      method: "DELETE",
+    });
+
     setItems((prevItems) => {
       const newItems = { ...prevItems };
 
@@ -508,7 +512,7 @@ export default function BoardContent({
   );
 
   return (
-    <div className="flex p-4">
+    <div className="flex p-4 relative">
       <DndContext
         sensors={sensors}
         collisionDetection={collisionDetectionStrategy}
@@ -522,7 +526,7 @@ export default function BoardContent({
           },
         }}
       >
-        <div className="lg:flex-[0_0_15%] lg:pr-2 group">
+        <div className="hidden xl:block lg:flex-[0_0_15%] lg:pr-2 group">
           <div className="bg-[rgb(220,234,254)] rounded-lg flex flex-col h-[calc(100vh-105.25px)] border border-gray-300">
             <div className="bg-[#ffffff3d] py-3.5 pr-2 pl-4 text-gray-800 font-bold leading-5 flex items-center justify-between">
               <div className="flex items-center space-x-2">

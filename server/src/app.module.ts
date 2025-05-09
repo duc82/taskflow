@@ -14,6 +14,7 @@ import { BoardsModule } from "./boards/boards.module";
 import { AvatarModule } from "./avatar/avatar.module";
 import { CloudinaryModule } from "./cloudinary/cloudinary.module";
 import { ColumnsModule } from "./columns/columns.module";
+import { UploadModule } from './upload/upload.module';
 const OAuth2 = google.auth.OAuth2;
 
 @Module({
@@ -100,6 +101,7 @@ const OAuth2 = google.auth.OAuth2;
     MailerModule,
     BoardsModule,
     AvatarModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

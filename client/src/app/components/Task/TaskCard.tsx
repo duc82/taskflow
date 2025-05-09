@@ -17,7 +17,7 @@ export default function TaskCard({
 }: {
   task: Task;
   updateTask: (id: string, task: Partial<Task>) => void;
-  deleteTask: (id: string) => void;
+  deleteTask: (id: string) => Promise<void>;
   isOverlay?: boolean;
 }) {
   const isMounted = useMount();
@@ -111,9 +111,10 @@ export default function TaskCard({
       </li>
       <EditTaskModal
         task={task}
-        onUpdate={updateTask}
         isOpen={isOpen}
+        onUpdate={updateTask}
         onClose={handleClose}
+        onDelete={deleteTask}
       />
     </>
   );
