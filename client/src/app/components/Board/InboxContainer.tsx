@@ -8,15 +8,7 @@ import React, { useMemo } from "react";
 import TaskCard from "../Task/TaskCard";
 import { useDroppable } from "@dnd-kit/core";
 
-export default function InboxContainer({
-  tasks,
-  updateTask,
-  deleteTask,
-}: {
-  tasks: Task[];
-  updateTask: (id: string, task: Partial<Task>) => void;
-  deleteTask: (taskId: string) => void;
-}) {
+export default function InboxContainer({ tasks }: { tasks: Task[] }) {
   const { setNodeRef } = useDroppable({
     id: "Inbox",
     data: {
@@ -35,12 +27,7 @@ export default function InboxContainer({
     >
       <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
         {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            updateTask={updateTask}
-            deleteTask={deleteTask}
-          />
+          <TaskCard key={task.id} task={task} />
         ))}
       </SortableContext>
     </ul>

@@ -5,7 +5,7 @@ import {
   IsUUID,
   ValidateIf,
 } from "class-validator";
-import { BoardVisibility } from "./boards.enum";
+import { BoardVisibility, MemberRole } from "./boards.enum";
 
 export class CreateBoardDto {
   @IsString()
@@ -30,4 +30,21 @@ export class CreateBoardDto {
     message: "User ID không hợp lệ",
   })
   userId?: string;
+}
+
+export class AddMemberDto {
+  @IsUUID(4, {
+    message: "Board ID không hợp lệ",
+  })
+  boardId: string;
+
+  @IsUUID(4, {
+    message: "User ID không hợp lệ",
+  })
+  userId: string;
+
+  @IsEnum(MemberRole, {
+    message: "Vai trò không hợp lệ",
+  })
+  role: MemberRole;
 }

@@ -16,12 +16,12 @@ export class PaginationLimitDto {
   @IsOptional()
   @IsInt()
   @Transform(({ value }) => parseInt(value))
-  page: number = 1;
+  page: number;
 
   @IsOptional()
   @IsInt()
   @Transform(({ value }) => parseInt(value))
-  limit: number = 20;
+  limit: number;
 }
 
 export class QueryDto extends IntersectionType(SearchDto, PaginationLimitDto) {}

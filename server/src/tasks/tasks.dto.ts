@@ -95,3 +95,44 @@ export class CreateTaskCommentDto {
   })
   taskId: string;
 }
+
+export class CreateActivityDto {
+  @IsNotEmpty({
+    message: "Nội dung hoạt động không được để trống",
+  })
+  content: string;
+
+  @IsUUID(4, {
+    message: "Task ID không hợp lệ",
+  })
+  taskId: string;
+}
+
+export class CreateCommentDto {
+  @IsNotEmpty({
+    message: "Nội dung bình luận không được để trống",
+  })
+  content: string;
+
+  @IsUUID(4, {
+    message: "Task ID không hợp lệ",
+  })
+  taskId: string;
+}
+
+export class CreateLabelDto {
+  @IsNotEmpty({
+    message: "Tên nhãn không được để trống",
+  })
+  name: string;
+
+  @IsNotEmpty({
+    message: "Màu sắc nhãn không được để trống",
+  })
+  color: string;
+
+  @IsUUID(4, {
+    message: "Task ID không hợp lệ",
+  })
+  taskId: string;
+}

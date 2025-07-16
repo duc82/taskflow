@@ -1,10 +1,17 @@
-import { ChangeEvent, DetailedHTMLProps, TextareaHTMLAttributes } from "react";
+import {
+  ChangeEvent,
+  DetailedHTMLProps,
+  ForwardedRef,
+  forwardRef,
+  TextareaHTMLAttributes,
+} from "react";
 
-export default function TextArea(
+export default forwardRef(function TextArea(
   props: DetailedHTMLProps<
     TextareaHTMLAttributes<HTMLTextAreaElement>,
     HTMLTextAreaElement
-  >
+  >,
+  ref: ForwardedRef<HTMLTextAreaElement>
 ) {
   const resizeTextarea = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = e.target;
@@ -17,6 +24,7 @@ export default function TextArea(
 
   return (
     <textarea
+      ref={ref}
       {...props}
       onChange={(e) => {
         resizeTextarea(e);
@@ -24,4 +32,4 @@ export default function TextArea(
       }}
     ></textarea>
   );
-}
+});

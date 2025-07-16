@@ -1,15 +1,11 @@
 "use client";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import {
-  CheckIcon,
-  EllipsisHorizontalIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/solid";
+import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import boardDecoration from "@/app/assets/board.svg";
 import Image from "next/image";
 import { useForm, Controller } from "react-hook-form";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BoardDto, boardSchema } from "@/app/schemas/board.schema";
 import Select from "react-select";
@@ -31,6 +27,7 @@ export default function CreateBoardModal({
   unplashImages: UnplashImageURL[];
   setBoards: Dispatch<SetStateAction<Board[]>>;
 }) {
+  const [coverEnd, setCoverEnd] = useState(7);
   const router = useRouter();
   const closeRef = useRef<HTMLButtonElement>(null);
   useDisableKeyboardModal();
@@ -113,22 +110,19 @@ export default function CreateBoardModal({
       <MenuItems
         anchor="right"
         as="div"
-        className="bg-white shadow-overlay rounded-lg p-4 pt-0 pb-4 ml-2 text-gray-600 text-sm w-80 z-40"
+        className="bg-white shadow-overlay rounded-lg p-4 pt-0 ml-2 text-gray-600 text-sm w-80 z-40"
       >
         <header className="py-1">
           <div className="flex items-center justify-between h-10">
             <div></div>
             <h2 className="text-center font-medium">Tạo bảng</h2>
             <MenuItem>
-              {({ close }) => (
-                <button
-                  type="button"
-                  className="size-8 hover:bg-gray-200 flex items-center justify-center rounded-lg"
-                  onClick={close}
-                >
-                  <XMarkIcon className="size-5" />
-                </button>
-              )}
+              <button
+                type="button"
+                className="size-8 hover:bg-gray-200 flex items-center justify-center rounded-lg"
+              >
+                <XMarkIcon className="size-5" />
+              </button>
             </MenuItem>
           </div>
         </header>
@@ -145,7 +139,7 @@ export default function CreateBoardModal({
               </label>
               <div className="mt-1">
                 <ul className="grid grid-cols-4 gap-1.5 mb-2">
-                  {unplashImages.slice(0, 4).map((url, index) => {
+                  {unplashImages.slice(0, coverEnd).map((url, index) => {
                     const imageUrl = `${url.raw}&q=40&auto=compress&fm=webp&w=2560`;
 
                     return (
@@ -177,9 +171,21 @@ export default function CreateBoardModal({
                       </li>
                     );
                   })}
+                  <li className="w-full h-10">
+                    {coverEnd < 30 && (
+                      <button
+                        type="button"
+                        className="bg-gray-200 hover:bg-gray-300 rounded-md flex items-center justify-center h-full w-full px-1.5 font-medium text-gray-800"
+                        onClick={() => setCoverEnd((prev) => prev + 8)}
+                      >
+                        <PlusIcon className="size-5" />
+                      </button>
+                    )}
+                  </li>
                 </ul>
-                <ul className="grid grid-cols-6 gap-1.5">
-                  {colors.slice(0, 5).map((color, index) => (
+
+                <ul className="grid grid-cols-5 gap-1.5">
+                  {colors.map((color, index) => (
                     <li key={index} className="w-full h-8">
                       <button
                         type="button"
@@ -207,38 +213,6 @@ export default function CreateBoardModal({
                       </button>
                     </li>
                   ))}
-                  <li className="h-8">
-                    <Menu>
-                      <MenuButton className="flex items-center justify-center w-full h-full bg-gray-100 rounded-md hover:bg-gray-300">
-                        <EllipsisHorizontalIcon className="size-5" />
-                      </MenuButton>
-                      <MenuItems
-                        anchor="left"
-                        as="div"
-                        className="bg-white shadow-lg rounded-lg p-4 pt-0 pb-4 ml-2 text-gray-600 text-sm w-80 z-50"
-                      >
-                        <header className="py-1">
-                          <div className="flex items-center justify-between h-10">
-                            <div></div>
-                            <h2 className="text-center font-medium">
-                              Phông nền bảng
-                            </h2>
-                            <MenuItem>
-                              {({ close }) => (
-                                <button
-                                  type="button"
-                                  className="size-8 hover:bg-gray-200 flex items-center justify-center rounded-lg"
-                                  onClick={close}
-                                >
-                                  <XMarkIcon className="size-5" />
-                                </button>
-                              )}
-                            </MenuItem>
-                          </div>
-                        </header>
-                      </MenuItems>
-                    </Menu>
-                  </li>
                 </ul>
               </div>
             </div>

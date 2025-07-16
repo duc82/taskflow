@@ -1,4 +1,5 @@
-import type { UserProps } from './user-table-row';
+import type { User } from "src/types/user";
+import { toLowerCaseNonAccentVietnamese } from "src/utils/nonVietnameseAccent";
 
 // ----------------------------------------------------------------------
 
@@ -6,17 +7,21 @@ export const visuallyHidden = {
   border: 0,
   margin: -1,
   padding: 0,
-  width: '1px',
-  height: '1px',
-  overflow: 'hidden',
-  position: 'absolute',
-  whiteSpace: 'nowrap',
-  clip: 'rect(0 0 0 0)',
+  width: "1px",
+  height: "1px",
+  overflow: "hidden",
+  position: "absolute",
+  whiteSpace: "nowrap",
+  clip: "rect(0 0 0 0)",
 } as const;
 
 // ----------------------------------------------------------------------
 
-export function emptyRows(page: number, rowsPerPage: number, arrayLength: number) {
+export function emptyRows(
+  page: number,
+  rowsPerPage: number,
+  arrayLength: number,
+) {
   return page ? Math.max(0, (1 + page) * rowsPerPage - arrayLength) : 0;
 }
 
@@ -35,17 +40,17 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 // ----------------------------------------------------------------------
 
 export function getComparator<Key extends keyof any>(
-  order: 'asc' | 'desc',
-  orderBy: Key
+  order: "asc" | "desc",
+  orderBy: Key,
 ): (
   a: {
     [key in Key]: number | string;
   },
   b: {
     [key in Key]: number | string;
-  }
+  },
 ) => number {
-  return order === 'desc'
+  return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
@@ -53,12 +58,16 @@ export function getComparator<Key extends keyof any>(
 // ----------------------------------------------------------------------
 
 type ApplyFilterProps = {
-  inputData: UserProps[];
+  inputData: User[];
   filterName: string;
   comparator: (a: any, b: any) => number;
 };
 
-export function applyFilter({ inputData, comparator, filterName }: ApplyFilterProps) {
+export function applyFilter({
+  inputData,
+  comparator,
+  filterName,
+}: ApplyFilterProps) {
   const stabilizedThis = inputData.map((el, index) => [el, index] as const);
 
   stabilizedThis.sort((a, b) => {
@@ -71,7 +80,10 @@ export function applyFilter({ inputData, comparator, filterName }: ApplyFilterPr
 
   if (filterName) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (user) =>
+        toLowerCaseNonAccentVietnamese(user.name).indexOf(
+          toLowerCaseNonAccentVietnamese(filterName),
+        ) !== -1,
     );
   }
 

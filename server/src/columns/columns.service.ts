@@ -1,8 +1,12 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { QueryDto } from "src/dtos/query.dto";
-import { DataSource, ILike, In, Not } from "typeorm";
+import { DataSource, ILike, In, Not, Raw } from "typeorm";
 import { Column } from "./columns.entity";
-import { CreateColumnDto, SwitchPositionColumnDto } from "./columns.dto";
+import {
+  CreateColumnDto,
+  MoveColumnDto,
+  SwitchPositionColumnDto,
+} from "./columns.dto";
 
 @Injectable()
 export class ColumnsService {
@@ -19,7 +23,9 @@ export class ColumnsService {
 
     const [columns, total] = await this.columnRepository.findAndCount({
       where: {
-        title: ILike(`%${search}%`),
+        title: Raw((alias) => `unaccent(${alias}) ILIKE unaccent(:search)`, {
+          search: `%${search}%`,
+        }),
         id: Not(In(excludeIds)),
       },
       skip,
@@ -89,7 +95,7 @@ export class ColumnsService {
       board: { id: boardId },
       position: (maxPosition?.maxPosition ?? 0) + 1000,
     });
-    return await this.columnRepository.save(newColumn);
+    return this.columnRepository.save(newColumn);
   }
 
   async switchPosition(
@@ -172,6 +178,38 @@ export class ColumnsService {
     };
   }
 
+  async moveColumn(columnId: string, body: MoveColumnDto) {
+    const { beforeColumnId, afterColumnId, newBoardId } = body;
+
+    const column = await this.columnRepository.findOne({
+      where: {
+        id: columnId,
+      },
+      relations: ["board"],
+    });
+
+    if (!column) {
+      throw new NotFoundException("Cột không tồn tại");
+    }
+
+    if (column.board.id !== newBoardId) {
+      column.board.id = newBoardId;
+      await column.save();
+    }
+
+    await this.switchPosition(columnId, {
+      beforeColumnId,
+      afterColumnId,
+      boardId: newBoardId,
+    });
+
+    return {
+      message: "Di chuyển danh sách thành công",
+    };
+  }
+
+  async cloneColumn(columnId: string, title: string, userId: string) {}
+
   async rebalancePositions(boardId: string) {
     const columns = await this.columnRepository.find({
       where: { board: { id: boardId } },
@@ -239,7 +277,7 @@ export class ColumnsService {
       throw new NotFoundException("Cột không tồn tại");
     }
 
-    await this.columnRepository.remove(column);
+    await this.columnRepository.softRemove(column);
 
     return {
       message: "Xóa cột thành công",

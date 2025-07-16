@@ -51,7 +51,7 @@ export default function Header({ session }: { session: Session | null }) {
       )}
     >
       <nav className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-        <Link href={session ? "/cong-viec" : "/"}>
+        <Link href="/">
           <Image
             src={logo}
             alt="Logo"

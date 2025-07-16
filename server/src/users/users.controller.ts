@@ -39,6 +39,14 @@ export class UsersController {
     return this.userService.findOne(user.userId);
   }
 
+  @Get("search")
+  async searchUsers(
+    @Query("query") query: string,
+    @User("userId") userId: string,
+  ) {
+    return this.userService.searchUsers(query, userId);
+  }
+
   @Get(":id")
   async getUser(
     @Param("id", new CustomParseUUIDPipe())
@@ -90,6 +98,11 @@ export class UsersController {
       message: "Cập nhật người dùng thành công",
       user: await this.userService.update(id, body, file),
     };
+  }
+
+  @Post("remove/multiple")
+  async softRemoveMultipleUsers(@Body("ids") ids: string[]) {
+    return this.userService.softRemoveMultiple(ids);
   }
 
   @Delete("remove/:id")

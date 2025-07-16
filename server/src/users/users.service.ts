@@ -66,6 +66,15 @@ export class UsersService {
 
     const excludeIds = JSON.parse(exclude);
 
+    if (!limit) {
+      return this.userRepository.find({
+        where: {
+          name: ILike(`%${search}%`),
+          id: Not(In(excludeIds)),
+        },
+      });
+    }
+
     const skip = (page - 1) * limit;
 
     const [users, total] = await this.userRepository.findAndCount({
@@ -83,6 +92,21 @@ export class UsersService {
       page,
       limit,
     };
+  }
+
+  async searchUsers(search: string, userId: string) {
+    const users = await this.userRepository
+      .createQueryBuilder("user")
+      .where(
+        "user.name ILIKE :search OR user.email ILIKE :search AND user.id != :userId",
+        {
+          search: `%${search}%`,
+          userId,
+        },
+      )
+      .getMany();
+
+    return users;
   }
 
   async findOne(id: string) {
@@ -166,6 +190,22 @@ export class UsersService {
     }
 
     await this.userRepository.softRemove(user);
+
+    return {
+      message: "Xóa người dùng thành công",
+    };
+  }
+
+  async softRemoveMultiple(ids: string[]) {
+    const users = await this.userRepository.findBy({
+      id: In(ids),
+    });
+
+    if (users.length === 0) {
+      throw new NotFoundException("Không tìm thấy người dùng nào để xóa");
+    }
+
+    await this.userRepository.softRemove(users);
 
     return {
       message: "Xóa người dùng thành công",

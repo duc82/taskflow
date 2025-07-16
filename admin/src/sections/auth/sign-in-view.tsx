@@ -1,71 +1,115 @@
-import { useState, useCallback } from 'react';
+import { useState } from "react";
 
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import InputAdornment from '@mui/material/InputAdornment';
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import InputAdornment from "@mui/material/InputAdornment";
 
-import { useRouter } from 'src/routes/hooks';
+import { useRouter } from "src/routes/hooks";
 
-import { Iconify } from 'src/components/iconify';
-
-// ----------------------------------------------------------------------
+import { Iconify } from "src/components/iconify";
+import { CircularProgress } from "@mui/material";
+import axios from "axios";
+import useUser from "src/routes/hooks/use-user";
 
 export function SignInView() {
   const router = useRouter();
-
+  const [values, setValues] = useState({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { setUser } = useUser();
 
-  const handleSignIn = useCallback(() => {
-    router.push('/');
-  }, [router]);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/sign-in`,
+        values,
+      );
+
+      if (data.user.role !== "admin") {
+        alert("Bạn không có quyền truy cập vào trang này.");
+        return;
+      }
+
+      localStorage.setItem("token", data.accessToken);
+      setUser(data.user);
+      setValues({ email: "", password: "" });
+      router.push("/");
+    } catch (error) {
+      console.log("Login error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderForm = (
     <Box
+      component="form"
       sx={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        flexDirection: 'column',
+        display: "flex",
+        alignItems: "flex-end",
+        flexDirection: "column",
       }}
+      onSubmit={handleSubmit}
     >
       <TextField
         fullWidth
         name="email"
-        label="Email address"
-        defaultValue="hello@gmail.com"
+        label="Địa chỉ email"
+        placeholder="Nhập địa chỉ email của bạn"
         sx={{ mb: 3 }}
         slotProps={{
           inputLabel: { shrink: true },
         }}
+        value={values.email}
+        onChange={handleChange}
+        required
       />
-
-      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        Forgot password?
-      </Link>
 
       <TextField
         fullWidth
         name="password"
-        label="Password"
-        defaultValue="@demo1234"
-        type={showPassword ? 'text' : 'password'}
+        label="Mật khẩu"
+        placeholder="Nhập mật khẩu của bạn"
+        type={showPassword ? "text" : "password"}
         slotProps={{
           inputLabel: { shrink: true },
           input: {
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  <Iconify icon={showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                >
+                  <Iconify
+                    icon={
+                      showPassword ? "solar:eye-bold" : "solar:eye-closed-bold"
+                    }
+                  />
                 </IconButton>
               </InputAdornment>
             ),
           },
         }}
+        value={values.password}
+        onChange={handleChange}
         sx={{ mb: 3 }}
+        required
       />
 
       <Button
@@ -74,9 +118,8 @@ export function SignInView() {
         type="submit"
         color="inherit"
         variant="contained"
-        onClick={handleSignIn}
       >
-        Sign in
+        {loading ? <CircularProgress size={24} color="inherit" /> : "Đăng nhập"}
       </Button>
     </Box>
   );
@@ -86,51 +129,15 @@ export function SignInView() {
       <Box
         sx={{
           gap: 1.5,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
           mb: 5,
         }}
       >
-        <Typography variant="h5">Sign in</Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            color: 'text.secondary',
-          }}
-        >
-          Don’t have an account?
-          <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-            Get started
-          </Link>
-        </Typography>
+        <Typography variant="h5">Đăng nhập Admin</Typography>
       </Box>
       {renderForm}
-      <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
-        <Typography
-          variant="overline"
-          sx={{ color: 'text.secondary', fontWeight: 'fontWeightMedium' }}
-        >
-          OR
-        </Typography>
-      </Divider>
-      <Box
-        sx={{
-          gap: 1,
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-      >
-        <IconButton color="inherit">
-          <Iconify width={22} icon="socials:google" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify width={22} icon="socials:github" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify width={22} icon="socials:twitter" />
-        </IconButton>
-      </Box>
     </>
   );
 }

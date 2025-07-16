@@ -13,7 +13,11 @@ import { QueryDto } from "src/dtos/query.dto";
 import { CustomParseUUIDPipe } from "src/pipes/CustomParseUUIDPipe.pipe";
 import { User } from "src/decorators/user.decorator";
 import { AuthGuard } from "src/guards/auth.guard";
-import { CreateColumnDto, SwitchPositionColumnDto } from "./columns.dto";
+import {
+  CreateColumnDto,
+  MoveColumnDto,
+  SwitchPositionColumnDto,
+} from "./columns.dto";
 import { ColumnsService } from "./columns.service";
 
 @UseGuards(AuthGuard)
@@ -53,6 +57,14 @@ export class ColumnsController {
     @Param("id", new CustomParseUUIDPipe()) id: string,
   ) {
     return this.columnService.switchPosition(id, body);
+  }
+
+  @Put("move/:id")
+  async moveColumn(
+    @Param("id", new CustomParseUUIDPipe()) id: string,
+    @Body() body: MoveColumnDto,
+  ) {
+    return this.columnService.moveColumn(id, body);
   }
 
   @Put("update/:id")

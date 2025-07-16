@@ -5,6 +5,8 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -32,18 +34,6 @@ export class Task extends BaseEntity {
 
   @ColumnTypeorm({ type: "text", nullable: true })
   description: string;
-
-  @ColumnTypeorm({
-    type: "boolean",
-    default: false,
-  })
-  isCompleted: boolean;
-
-  @ColumnTypeorm({
-    type: "boolean",
-    default: false,
-  })
-  isWatching: boolean;
 
   @ColumnTypeorm({
     nullable: true,
@@ -93,6 +83,26 @@ export class Task extends BaseEntity {
     onDelete: "CASCADE",
   })
   userInbox: User;
+
+  @ManyToMany(() => User)
+  @JoinTable({
+    name: "task_members",
+    joinColumn: {
+      name: "taskId",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "userId",
+      referencedColumnName: "id",
+    },
+  })
+  members: User[];
+
+  @ColumnTypeorm({
+    type: "timestamptz",
+    nullable: true,
+  })
+  completedAt: Date;
 
   @ColumnTypeorm({ type: "timestamptz", nullable: true })
   startDate: Date;

@@ -23,6 +23,7 @@ import { BoardMember } from "src/boards/entities/board_members.entity";
 import { TaskActivity } from "src/tasks/entities/task_activities.entity";
 import { Board } from "src/boards/entities/boards.entity";
 import { Column } from "src/columns/columns.entity";
+import { TaskAttachment } from "src/tasks/entities/task_attachments.entity";
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -82,6 +83,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Board, (board) => board.owner)
   boards: Board[];
+
+  @OneToMany(() => TaskAttachment, (task) => task.user)
+  taskAttachments: TaskAttachment[];
 
   @DeleteDateColumn({
     type: "timestamptz",

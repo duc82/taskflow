@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Task } from "./tasks.entity";
+import { User } from "src/users/entities/users.entity";
 
 @Entity("task_attachments")
 export class TaskAttachment extends BaseEntity {
@@ -28,6 +29,11 @@ export class TaskAttachment extends BaseEntity {
     onDelete: "CASCADE",
   })
   task: Task;
+
+  @ManyToOne(() => User, (user) => user.taskAttachments, {
+    onDelete: "CASCADE",
+  })
+  user: User;
 
   @DeleteDateColumn({
     type: "timestamptz",

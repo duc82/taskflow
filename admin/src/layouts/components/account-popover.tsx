@@ -14,7 +14,7 @@ import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 
 import { useRouter, usePathname } from 'src/routes/hooks';
 
-import { _myAccount } from 'src/_mock';
+import useUser from 'src/routes/hooks/use-user';
 
 // ----------------------------------------------------------------------
 
@@ -29,6 +29,7 @@ export type AccountPopoverProps = IconButtonProps & {
 
 export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps) {
   const router = useRouter();
+  const { user } = useUser();
 
   const pathname = usePathname();
 
@@ -50,6 +51,11 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
     [handleClosePopover, router]
   );
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/sign-in');
+  };
+
   return (
     <>
       <IconButton
@@ -64,8 +70,8 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         }}
         {...other}
       >
-        <Avatar src={_myAccount.photoURL} alt={_myAccount.displayName} sx={{ width: 1, height: 1 }}>
-          {_myAccount.displayName.charAt(0).toUpperCase()}
+        <Avatar src={user?.avatar} alt={user?.name} sx={{ width: 1, height: 1 }}>
+          {user?.name}
         </Avatar>
       </IconButton>
 
@@ -83,11 +89,11 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
       >
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {_myAccount?.displayName}
+            {user?.name}
           </Typography>
 
-          <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {_myAccount?.email}
+          <Typography variant="body2" sx={{ color: 'text.secondary' }} title={user?.email} noWrap>
+            {user?.email}
           </Typography>
         </Box>
 
@@ -129,8 +135,8 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
-          <Button fullWidth color="error" size="medium" variant="text">
-            Logout
+          <Button fullWidth color="error" size="medium" variant="text" onClick={handleLogout}>
+            Đăng xuất
           </Button>
         </Box>
       </Popover>

@@ -14,6 +14,7 @@ import { Task } from "src/tasks/entities/tasks.entity";
 import { BoardMember } from "./board_members.entity";
 import { User } from "src/users/entities/users.entity";
 import { Column } from "src/columns/columns.entity";
+import { TaskLabel } from "src/tasks/entities/task_labels.entity";
 
 @Entity("boards")
 export class Board extends BaseEntity {

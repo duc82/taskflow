@@ -1,4 +1,5 @@
 import { Column } from "./column";
+import { Label } from "./task";
 import { User } from "./user";
 
 export interface BoardMember {
@@ -16,6 +17,7 @@ export interface Board {
   columns: Column[];
   members: BoardMember[];
   visibility: "private" | "public";
+  labels: Label[];
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -23,6 +25,11 @@ export interface Board {
 
 export interface BoardReponse {
   board: Board;
+  message: string;
+}
+
+export interface AddMemberResponse {
+  member: BoardMember;
   message: string;
 }
 

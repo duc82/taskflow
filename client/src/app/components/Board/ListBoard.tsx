@@ -55,6 +55,7 @@ export default function ListBoard({
           name="search"
           placeholder="Tìm kiếm..."
           onChange={handleSearch}
+          className="rounded border border-gray-300 px-3 py-2"
         />
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">

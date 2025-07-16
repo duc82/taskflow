@@ -48,3 +48,11 @@
 #board::-webkit-scrollbar-track {
   @apply bg-gray-900/30 rounded-full;
 }
+
+.tiptap.ProseMirror img {
+  @apply w-1/2;
+}
+
+.tiptap.ProseMirror p {
+  @apply m-0!;
+}

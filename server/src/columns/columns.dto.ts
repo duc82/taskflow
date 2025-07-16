@@ -31,3 +31,18 @@ export class SwitchPositionColumnDto {
   })
   boardId: string;
 }
+
+export class MoveColumnDto {
+  @IsUUID(4, {
+    message: "Board ID không hợp lệ",
+  })
+  newBoardId: string;
+
+  @ValidateIf((o) => o.beforeColumnId)
+  @IsUUID(4)
+  beforeColumnId?: string;
+
+  @ValidateIf((o) => o.afterColumnId)
+  @IsUUID(4)
+  afterColumnId?: string;
+}

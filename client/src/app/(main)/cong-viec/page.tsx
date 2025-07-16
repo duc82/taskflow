@@ -1,11 +1,11 @@
 import fetchAuth from "@/app/actions/fetchAuth.action";
 import { getUnplashImages } from "@/app/actions/unplash.action";
 import ListBoard from "@/app/components/Board/ListBoard";
-import { BoardsResponse } from "@/app/types/board";
+import { Board } from "@/app/types/board";
 
 export default async function Boards() {
-  const [{ boards }, unplashImages] = await Promise.all([
-    fetchAuth<BoardsResponse>("/boards"),
+  const [boards, unplashImages] = await Promise.all([
+    fetchAuth<Board[]>("/boards"),
     getUnplashImages(1, 30),
   ]);
 

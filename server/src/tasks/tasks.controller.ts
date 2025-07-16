@@ -7,14 +7,23 @@ import {
   Post,
   Put,
   Query,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
 import { QueryDto } from "src/dtos/query.dto";
 import { CustomParseUUIDPipe } from "src/pipes/CustomParseUUIDPipe.pipe";
-import { CreateTaskDto, SwitchPositionTaskDto } from "./tasks.dto";
+import {
+  CreateActivityDto,
+  CreateCommentDto,
+  CreateLabelDto,
+  CreateTaskDto,
+  SwitchPositionTaskDto,
+} from "./tasks.dto";
 import { User } from "src/decorators/user.decorator";
 import { AuthGuard } from "src/guards/auth.guard";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 
 @UseGuards(AuthGuard)
 @Controller("tasks")
@@ -56,12 +65,60 @@ export class TasksController {
     return this.taskService.switchPosition(id, body, userId);
   }
 
+  @Post("activities/create")
+  async createActivity(
+    @Body() body: CreateActivityDto,
+    @User("userId") userId: string,
+  ) {
+    return this.taskService.createActivity(body, userId);
+  }
+
+  @Post("comments/create")
+  async createComment(
+    @Body() body: CreateCommentDto,
+    @User("userId") userId: string,
+  ) {
+    return this.taskService.createComment(body, userId);
+  }
+
+  @Delete("comments/remove/:id")
+  async removeComment(@Param("id", new CustomParseUUIDPipe()) id: string) {
+    return this.taskService.removeComment(id);
+  }
+
+  @Post("labels/create")
+  async createLabel(@Body() body: CreateLabelDto) {
+    return this.taskService.createLabel(body);
+  }
+
+  @Delete("labels/delete/:id")
+  async deleteLabel(@Param("id", new CustomParseUUIDPipe()) id: string) {
+    return this.taskService.deleteLabel(id);
+  }
+
+  @Post("attachments/upload")
+  @UseInterceptors(FilesInterceptor("files"))
+  async uploadAttachment(
+    @Body() { taskId }: { taskId: string },
+    @User("userId") userId: string,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.taskService.uploadAttachment(taskId, files, userId);
+  }
+
+  @Delete("attachments/remove/:id")
+  async removeAttachment(@Param("id", new CustomParseUUIDPipe()) id: string) {
+    return this.taskService.removeAttachment(id);
+  }
+
   @Put("update/:id")
+  @UseInterceptors(FileInterceptor("file"))
   async update(
     @Param("id", new CustomParseUUIDPipe()) id: string,
     @Body() body: Partial<CreateTaskDto>,
+    @UploadedFiles() file?: Express.Multer.File,
   ) {
-    return this.taskService.update(id, body);
+    return this.taskService.update(id, body, file);
   }
 
   @Delete("remove/:id")

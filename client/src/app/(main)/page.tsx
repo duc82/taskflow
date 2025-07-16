@@ -3,16 +3,8 @@ import Link from "next/link";
 import Features from "../components/Home/Features";
 import Stats from "../components/Home/Stats";
 import Testimonials from "../components/Home/Testimonials";
-import getServerSession from "../libs/session";
-import { redirect } from "next/navigation";
 
 export default async function Home() {
-  const session = await getServerSession();
-
-  // if (session) {
-  //   redirect("/cong-viec");
-  // }
-
   return (
     <div>
       <section className="h-screen w-full relative">
@@ -29,7 +21,7 @@ export default async function Home() {
           <div className="max-w-2xl px-4 mx-auto text-center">
             <div className="hidden sm:mb-8 sm:flex sm:justify-center">
               <div className="relative rounded-full px-3 py-1 text-sm/6 ring-1 text-gray-200 ring-gray-100/10 hover:ring-gray-100/20">
-                Lorem ipsum dolor sit amet consectetur.{" "}
+                Quản lý đánh giá công việc hàng đầu{" "}
                 <Link
                   href="/gioi-thieu"
                   className="font-semibold text-blue-600 inline-flex items-center gap-x-1"

@@ -14,7 +14,7 @@ export default async function MainLayout({
     <SessionProvider>
       <Header session={session} />
       {children}
-      <Footer session={session} />
+      <Footer />
     </SessionProvider>
   );
 }
