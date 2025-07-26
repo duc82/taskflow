@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Message</title>
+    <style>
+      body {
+        background: #f5f7fa;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 500px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        padding: 32px 28px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+      .header h2 {
+        color: #2d3a4b;
+        margin: 0 0 8px 0;
+        font-size: 2rem;
+        letter-spacing: 1px;
+      }
+      .header p {
+        color: #6c7a89;
+        margin: 0;
+        font-size: 1rem;
+      }
+      .info {
+        margin-bottom: 20px;
+      }
+      .info strong {
+        color: #2d3a4b;
+        display: inline-block;
+        width: 90px;
+      }
+      .message-box {
+        background: #f0f4f8;
+        border-left: 4px solid #4f8cff;
+        padding: 18px 16px;
+        border-radius: 6px;
+        color: #333;
+        font-size: 1.05rem;
+        margin-bottom: 18px;
+        white-space: pre-line;
+      }
+      .footer {
+        text-align: center;
+        color: #a0aab8;
+        font-size: 0.95rem;
+        margin-top: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Tin nhắn liên hệ mới</h2>
+        <p>Bạn vừa nhận được một tin nhắn mới từ biểu mẫu liên hệ trên trang web của mình.</p>
+      </div>
+      <div class="info">
+        <div><strong>Tên:</strong> <%= name %></div>
+        <div><strong>Email:</strong> <%= email %></div>
+        <% if (typeof phone !== 'undefined' && phone) { %>
+        <div><strong>Số điện thoại:</strong> <%= phone %></div>
+        <% } %>
+        <% if (typeof subject !== 'undefined' && subject) { %>
+        <div><strong>Chủ đề:</strong> <%= subject %></div>
+        <% } %>
+      </div>
+      <div class="message-box">
+        <%= message %>
+      </div>
+      <div class="footer">
+        &mdash; Tin nhắn này được gửi qua biểu mẫu liên hệ trên trang web của bạn.
+      </div>
+    </div>
+  </body>
+</html>

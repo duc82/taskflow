@@ -1,0 +1,58 @@
+@import "tailwindcss";
+@import "./styles/_keyframe-animations.scss";
+@import "./styles/_variables.scss";
+
+@custom-variant dark (&:is(.dark *));
+
+@plugin "@tailwindcss/forms";
+
+@plugin "tailwindcss-animate";
+
+@plugin "tailwind-scrollbar-hide";
+
+@theme {
+  --background-image-board: url(https://images.unsplash.com/photo-1742156345582-b857d994c84e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MDY2fDB8MXxjb2xsZWN0aW9ufDF8MzE3MDk5fHx8fHwyfHwxNzQ0Nzg4MTg5fA&ixlib=rb-4.0.3&q=80&w=400&quot;);
+  --shadow-raised: 0px 1px 1px #091e4240, 0px 0px 1px #091e424f;
+  --shadow-overlay: 0px 8px 12px #091e4226, 0px 0px 1px #091e424f,
+    0px 8px 12px #091e4226, 0px 0px 1px #091e424f;
+}
+
+@layer base {
+  html {
+    @apply p-0!;
+  }
+
+  body {
+    @apply font-sans;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  ul,
+  ol,
+  li {
+    @apply list-none!;
+  }
+}
+
+#board::-webkit-scrollbar {
+  @apply size-2.5;
+}
+
+#board::-webkit-scrollbar-thumb {
+  @apply bg-gray-100/40 hover:bg-gray-100/70 rounded-full;
+}
+
+#board::-webkit-scrollbar-track {
+  @apply bg-gray-900/30 rounded-full;
+}
+
+.tiptap.ProseMirror img {
+  @apply w-1/2;
+}
+
+.tiptap.ProseMirror p {
+  @apply m-0!;
+}
