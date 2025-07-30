@@ -195,7 +195,9 @@ export default function BoardContent({
   const { containerRef, handleMouseDown, handleTouchStart } =
     useScrollByDragging<HTMLUListElement>();
   useBodyOverflow();
-  useDisableKeyboardModal();
+  useDisableKeyboardModal({
+    execepts: ["Enter"],
+  });
   const router = useRouter();
 
   const sensors = useSensors(
@@ -930,20 +932,7 @@ export default function BoardContent({
                 style={contrasts[contrast]}
               >
                 <div className="flex justify-between relative flex-wrap items-center p-3 gap-1">
-                  <div
-                    ref={editFormRef}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        const title = (e.target as HTMLInputElement).value;
-                        if (!title.trim()) {
-                          setIsEditHeader(false);
-                          return;
-                        }
-                        handleUpdateBoard({ title });
-                        setIsEditHeader(false);
-                      }
-                    }}
-                  >
+                  <div ref={editFormRef}>
                     <div
                       className="cursor-pointer h-8"
                       onClick={() => setIsEditHeader(true)}
@@ -961,6 +950,22 @@ export default function BoardContent({
                             name="boardTitle"
                             id="boardTitle"
                             defaultValue={board.title}
+                            onBlur={(e) => {
+                              const title = (e.target as HTMLInputElement)
+                                .value;
+                              if (!title.trim()) {
+                                setIsEditHeader(false);
+                                return;
+                              }
+                              setIsEditHeader(false);
+                              handleUpdateBoard({ title });
+                            }}
+                            onKeyDown={(e) => {
+                              console.log("Key pressed:", e.key); // Debug log
+                              if (e.key === "Enter") {
+                                e.currentTarget.blur(); // Triggers the onBlur event
+                              }
+                            }}
                             className="h-8 w-52 px-2.5 text-lg font-bold bg-white text-gray-800 rounded-sm border-none ring-2 ring-blue-500"
                           />
                         </>

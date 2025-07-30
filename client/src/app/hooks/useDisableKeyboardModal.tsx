@@ -2,19 +2,32 @@
 
 import { useEffect } from "react";
 
-export default function useDisableKeyboardModal() {
+const allowedHeadlessUIKeys = [
+  "ArrowUp",
+  "ArrowDown",
+  "Enter",
+  " ",
+  "Home",
+  "End",
+  "Escape",
+] as const;
+
+type AllowedKeys = (typeof allowedHeadlessUIKeys)[number];
+
+interface DisableKeyboardModalProps {
+  execepts: AllowedKeys[];
+}
+
+export default function useDisableKeyboardModal(
+  props?: DisableKeyboardModalProps
+) {
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
-      const allowedHeadlessUIKeys = [
-        "ArrowUp",
-        "ArrowDown",
-        "Enter",
-        " ", // Space Key
-        "Home",
-        "End",
-        "Escape",
-      ];
-      if (allowedHeadlessUIKeys.includes(e.key)) {
+      const newAllowedHeadlessUIKeys = props?.execepts
+        ? allowedHeadlessUIKeys.filter((key) => !props.execepts.includes(key))
+        : allowedHeadlessUIKeys;
+
+      if ((newAllowedHeadlessUIKeys as string[]).includes(e.key)) {
         e.stopPropagation();
       }
     };
@@ -23,7 +36,7 @@ export default function useDisableKeyboardModal() {
     return () => {
       window.removeEventListener("keydown", handleKeydown, true);
     };
-  }, []);
+  }, [props?.execepts]);
 
   return null;
 }
