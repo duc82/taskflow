@@ -20,6 +20,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await fetch(`${process.env.NEXT_PUBLIC_API_URL}`);
   return (
     <html lang="vi">
       <body className={`${inter.variable} antialiased`}>
