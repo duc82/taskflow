@@ -50,12 +50,13 @@ export default function Stats() {
             {stats.map((stat) => (
               <div
                 key={stat.name}
-                className="relative px-6 before:content-[''] before:w-[1px] before:bg-white/20 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-full"
+                className="relative px-6 before:content-[''] before:w-px before:bg-white/20 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-full"
               >
                 <CountUp
                   end={+stat.value.split("+")[0]}
                   suffix={stat.value[stat.value.length - 1]}
                   enableScrollSpy
+                  scrollSpyOnce
                   className="text-4xl font-bold block mb-3"
                 />
                 <span className="text-base font-medium">{stat.name}</span>

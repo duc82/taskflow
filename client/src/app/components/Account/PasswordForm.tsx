@@ -14,8 +14,7 @@ import Spinner from "../Spinner";
 
 export default function PasswordForm() {
   const {
-    register,
-    handleSubmit,
+    register,    handleSubmit,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<UpdatePasswordDto>({
@@ -31,7 +30,7 @@ export default function PasswordForm() {
         {
           method: "POST",
           body: JSON.stringify(data),
-        }
+        },
       );
       toast.success(result.message);
       reset();
@@ -50,7 +49,7 @@ export default function PasswordForm() {
         <div className="mb-4 rounded-md bg-red-50 p-3" role="alert">
           <div className="flex items-center">
             <XCircleIcon
-              className="size-5 flex-shrink-0 text-red-400"
+              className="size-5 shrink-0 text-red-400"
               aria-hidden="true"
             />
             <div className="ml-2">

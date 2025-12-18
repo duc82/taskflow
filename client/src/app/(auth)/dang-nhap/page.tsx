@@ -65,7 +65,7 @@ export default function Login() {
           <div className="mb-4 rounded-md bg-red-50 p-3" role="alert">
             <div className="flex items-center">
               <XCircleIcon
-                className="size-5 flex-shrink-0 text-red-400"
+                className="size-5 shrink-0 text-red-400"
                 aria-hidden="true"
               />
               <div className="ml-2">

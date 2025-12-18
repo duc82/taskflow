@@ -169,7 +169,7 @@ export default function BoardContent({
   const [filter, setFilter] = useState<Filter>(initialFilter);
 
   const [actionMenu, setActionMenu] = useState<"default" | "changeCover">(
-    "default"
+    "default",
   );
   const [coverEnd, setCoverEnd] = useState(7);
   const [unplashImages, setUnplashImages] = useState<UnplashImageURL[]>([]);
@@ -205,7 +205,7 @@ export default function BoardContent({
       activationConstraint: {
         distance: 3,
       },
-    })
+    }),
   );
   // Ref to store the last over id during drag and drop
   const lastOverId = useRef<UniqueIdentifier | null>(null);
@@ -219,7 +219,7 @@ export default function BoardContent({
         return closestCenter({
           ...args,
           droppableContainers: args.droppableContainers.filter(
-            (container) => container.id in items && container.id !== "Inbox"
+            (container) => container.id in items && container.id !== "Inbox",
           ),
         });
       }
@@ -245,7 +245,7 @@ export default function BoardContent({
               droppableContainers: args.droppableContainers.filter(
                 (container) =>
                   container.id !== overId &&
-                  containerItems.some((task) => task.id === container.id)
+                  containerItems.some((task) => task.id === container.id),
               ),
             })[0]?.id;
           }
@@ -267,7 +267,7 @@ export default function BoardContent({
       // If no droppable is matched, return the last match
       return lastOverId.current ? [{ id: lastOverId.current }] : [];
     },
-    [activeId, items]
+    [activeId, items],
   );
 
   // Not finished
@@ -357,21 +357,21 @@ export default function BoardContent({
 
   const handleUpdateTask = async (
     id: string,
-    body: Partial<Task> | FormData
+    body: Partial<Task> | FormData,
   ) => {
     const { task: updatedTask } = await fetchAuth<TaskReponse>(
       `/tasks/update/${id}`,
       {
         method: "PUT",
         body: body instanceof FormData ? body : JSON.stringify(body),
-      }
+      },
     );
 
     setItems((prevItems) => {
       const newItems = { ...prevItems };
       for (const key in newItems) {
         newItems[key] = newItems[key].map((t) =>
-          t.id === id ? { ...t, ...updatedTask } : t
+          t.id === id ? { ...t, ...updatedTask } : t,
         );
       }
       return newItems;
@@ -401,7 +401,7 @@ export default function BoardContent({
 
     unstable_batchedUpdates(() => {
       setContainers((prevColumns) =>
-        prevColumns.filter((column) => column !== columnId)
+        prevColumns.filter((column) => column !== columnId),
       );
       setItems((prevItems) => {
         const newItems = { ...prevItems };
@@ -427,7 +427,7 @@ export default function BoardContent({
     }
 
     return Object.keys(items).find((key) =>
-      items[key].map((task) => task.id).includes(id as string)
+      items[key].map((task) => task.id).includes(id as string),
     );
   };
 
@@ -455,7 +455,7 @@ export default function BoardContent({
         const overItems = items[overContainer];
         const overIndex = overItems.findIndex((task) => task.id === overId);
         const activeIndex = activeItems.findIndex(
-          (task) => task.id === activeId
+          (task) => task.id === activeId,
         );
 
         let newIndex: number;
@@ -480,14 +480,14 @@ export default function BoardContent({
         return {
           ...items,
           [activeContainer]: items[activeContainer].filter(
-            (task) => task.id !== activeId
+            (task) => task.id !== activeId,
           ),
           [overContainer]: [
             ...items[overContainer].slice(0, newIndex),
             items[activeContainer][activeIndex],
             ...items[overContainer].slice(
               newIndex,
-              items[overContainer].length
+              items[overContainer].length,
             ),
           ],
         };
@@ -512,10 +512,10 @@ export default function BoardContent({
       const afterCategoryName = newContainers[overIndex + 1];
       const columnId = activeId as string;
       const beforeColumnId = board.columns.find(
-        (column) => column.id === beforeCategoryName
+        (column) => column.id === beforeCategoryName,
       )?.id;
       const afterColumnId = board.columns.find(
-        (column) => column.id === afterCategoryName
+        (column) => column.id === afterCategoryName,
       )?.id;
       await switchPositionColumn({
         boardId: board.id,
@@ -532,10 +532,10 @@ export default function BoardContent({
       return;
     }
     const activeIndex = items[activeContainer].findIndex(
-      (task) => task.id === activeId
+      (task) => task.id === activeId,
     );
     const overIndex = items[overContainer].findIndex(
-      (task) => task.id === overId
+      (task) => task.id === overId,
     );
     const isMovedToNewContainer = recentlyMovedToNewContainer.current;
     if (activeId !== overId || isMovedToNewContainer) {
@@ -544,7 +544,7 @@ export default function BoardContent({
         [overContainer]: arrayMove(
           items[overContainer],
           activeIndex,
-          overIndex
+          overIndex,
         ),
       };
       setItems(newItems);
@@ -573,7 +573,7 @@ export default function BoardContent({
         {
           method: "PUT",
           body: JSON.stringify(body),
-        }
+        },
       );
 
       setBoard((prev) => ({ ...prev, ...newBoard }));
@@ -584,7 +584,7 @@ export default function BoardContent({
 
   const handleUpdateColumn = async (
     columnId: string,
-    data: Partial<Column>
+    data: Partial<Column>,
   ) => {
     try {
       const { column } = await fetchAuth<ColumnResponse>(
@@ -592,12 +592,12 @@ export default function BoardContent({
         {
           method: "PUT",
           body: JSON.stringify(data),
-        }
+        },
       );
 
       setBoard((prev) => {
         const updatedColumns = prev.columns.map((col) =>
-          col.id === columnId ? column : col
+          col.id === columnId ? column : col,
         );
         return { ...prev, columns: updatedColumns };
       });
@@ -621,8 +621,8 @@ export default function BoardContent({
     for (const key in initialItems) {
       const filteredTasks = initialItems[key].filter((task) =>
         toLowerCaseNonAccentVietnamese(task.title).includes(
-          toLowerCaseNonAccentVietnamese(value)
-        )
+          toLowerCaseNonAccentVietnamese(value),
+        ),
       );
       initialItems[key] = filteredTasks;
     }
@@ -650,7 +650,7 @@ export default function BoardContent({
 
     for (const key in initialItems) {
       const filteredTasks = initialItems[key].filter((task) =>
-        id === "completed" ? task.completedAt : !task.completedAt
+        id === "completed" ? task.completedAt : !task.completedAt,
       );
       initialItems[key] = filteredTasks;
     }
@@ -706,7 +706,7 @@ export default function BoardContent({
       label: string;
       email: string;
       avatar: string;
-    }>
+    }>,
   ) => {
     const initialItems = convertToItems(board.columns);
 
@@ -720,7 +720,7 @@ export default function BoardContent({
 
     for (const key in initialItems) {
       const filteredTasks = initialItems[key].filter((task) =>
-        task.members.some((u) => usersId.includes(u.id))
+        task.members.some((u) => usersId.includes(u.id)),
       );
       initialItems[key] = filteredTasks;
     }
@@ -742,7 +742,7 @@ export default function BoardContent({
 
     for (const key in initialItems) {
       const filteredItems = initialItems[key].filter((task) =>
-        task.members.every((m) => !m)
+        task.members.every((m) => !m),
       );
       initialItems[key] = filteredItems;
     }
@@ -764,7 +764,7 @@ export default function BoardContent({
 
     for (const key in initialItems) {
       const filteredItems = initialItems[key].filter((task) =>
-        task.members.some((m) => m.id === user.id)
+        task.members.some((m) => m.id === user.id),
       );
       initialItems[key] = filteredItems;
     }
@@ -808,7 +808,7 @@ export default function BoardContent({
       })
       .then((response) => {
         setUnplashImages(
-          response.response?.results.map((data) => data.urls) || []
+          response.response?.results.map((data) => data.urls) || [],
         );
       })
       .catch((error) => {
@@ -817,7 +817,7 @@ export default function BoardContent({
   }, []);
 
   const containersWithoutInbox = containers.filter(
-    (container) => container !== "Inbox"
+    (container) => container !== "Inbox",
   );
 
   return (
@@ -976,7 +976,7 @@ export default function BoardContent({
                     <ul className="flex items-center">
                       {[...board.members]
                         .sort((a, b) =>
-                          a.role === "admin" ? -1 : b.role === "admin" ? 1 : 0
+                          a.role === "admin" ? -1 : b.role === "admin" ? 1 : 0,
                         )
                         .map((member, i, arrays) => (
                           <li
@@ -1476,7 +1476,7 @@ export default function BoardContent({
                   </div>
                 </div>
               </div>
-              <div className="flex-grow-1 overflow-y-hidden">
+              <div className="grow overflow-y-hidden">
                 <ul
                   className="px-1.5 h-[calc(100%-8px)] flex flex-row select-none overflow-x-auto overflow-y-hidden"
                   id="board"
@@ -1504,7 +1504,7 @@ export default function BoardContent({
                     ))}
                   </SortableContext>
 
-                  <li className="flex-grow-1 px-1.5">
+                  <li className="grow px-1.5">
                     <div
                       onMouseDown={(e) => e.stopPropagation()}
                       onMouseUp={(e) => e.preventDefault()}
@@ -1590,7 +1590,7 @@ export default function BoardContent({
                       <TaskCard
                         task={
                           items[findContainer(activeId) as string].find(
-                            (task) => task.id === activeId
+                            (task) => task.id === activeId,
                           ) as Task
                         }
                         isOverlay={true}
@@ -1605,7 +1605,7 @@ export default function BoardContent({
                   boardId={board.id}
                 />
               </>,
-              document.body
+              document.body,
             )}
         </DndContext>
       </div>

@@ -22,7 +22,7 @@ interface UploadOptions {
   upload: (
     file: File,
     onProgress: (event: { progress: number }) => void,
-    signal: AbortSignal
+    signal: AbortSignal,
   ) => Promise<string>;
   onSuccess?: (url: string) => void;
   onError?: (error: Error) => void;
@@ -34,7 +34,7 @@ function useFileUpload(options: UploadOptions) {
   const uploadFile = async (file: File): Promise<string | null> => {
     if (file.size > options.maxSize) {
       const error = new Error(
-        `File size exceeds maximum allowed (${options.maxSize / 1024 / 1024}MB)`
+        `File size exceeds maximum allowed (${options.maxSize / 1024 / 1024}MB)`,
       );
       options.onError?.(error);
       return null;
@@ -68,7 +68,7 @@ function useFileUpload(options: UploadOptions) {
             };
           });
         },
-        abortController.signal
+        abortController.signal,
       );
 
       if (!url) throw new Error("Upload failed: No URL returned");
@@ -99,7 +99,7 @@ function useFileUpload(options: UploadOptions) {
           };
         });
         options.onError?.(
-          error instanceof Error ? error : new Error("Upload failed")
+          error instanceof Error ? error : new Error("Upload failed"),
         );
       }
       return null;
@@ -117,8 +117,8 @@ function useFileUpload(options: UploadOptions) {
         new Error(
           `Maximum ${options.limit} file${
             options.limit === 1 ? "" : "s"
-          } allowed`
-        )
+          } allowed`,
+        ),
       );
       return null;
     }
@@ -363,7 +363,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
     const url = await uploadFiles(files);
 
     if (url) {
-      const pos = props.getPos();
+      const pos = props.getPos() || 0;
       const filename = files[0]?.name.replace(/\.[^/.]+$/, "") || "unknown";
 
       props.editor

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ProgressBar from "./components/ProgressBar";
@@ -9,18 +8,11 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Quản lý đánh giá mức độ hoàn thành công việc",
-  description:
-    "Dễ dàng quản lý công việc, đánh giá mức độ hoàn thành công việc của cá nhân, nhóm và doanh nghiệp.",
-};
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await fetch(`${process.env.NEXT_PUBLIC_API_URL}`);
   return (
     <html lang="vi">
       <body className={`${inter.variable} antialiased`}>

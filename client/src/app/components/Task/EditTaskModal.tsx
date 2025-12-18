@@ -71,7 +71,7 @@ export default function EditTaskModal({
   });
   const [editCommentId, setEditCommentId] = useState<string>("");
   const [description, setDescription] = useState<string>(
-    task.description || ""
+    task.description || "",
   );
   const [commentContent, setCommentContent] = useState<string>("");
   const [editCommentContent, setEditCommentContent] = useState<string>("");
@@ -81,14 +81,14 @@ export default function EditTaskModal({
       ? []
       : board.members
           .filter((m) => task.members.every((tm) => tm.id !== m.user.id))
-          .map((m) => m.user)
+          .map((m) => m.user),
   );
   const [date, setDate] = useState({
     startDate: task.startDate?.split("T")[0] || "",
     dueDate:
       task.dueDate?.split("T")[0] ||
       new Date(
-        new Date(task.startDate || Date.now()).getTime() + 24 * 60 * 60 * 1000 // Default to tomorrow
+        new Date(task.startDate || Date.now()).getTime() + 24 * 60 * 60 * 1000, // Default to tomorrow
       )
         .toISOString()
         .split("T")[0],
@@ -99,10 +99,10 @@ export default function EditTaskModal({
   });
   const [dueTime, setDueTime] = useState<string>(
     task.dueDate?.split("T")[1]?.substring(0, 5) ||
-      new Date().toTimeString().split(" ")[0].substring(0, 5)
+      new Date().toTimeString().split(" ")[0].substring(0, 5),
   );
   const [attachments, setAttachments] = useState<Attachment[]>(
-    task?.attachments || []
+    task?.attachments || [],
   );
   const [comments, setComments] = useState<Comment[]>(task?.comments || []);
   const [labels, setLabels] = useState<Label[]>(task?.labels || []);
@@ -127,7 +127,7 @@ export default function EditTaskModal({
           body: JSON.stringify({
             description,
           }),
-        }
+        },
       );
       updateTask(task.id, response.task);
       setDescription(response.task.description || "");
@@ -148,7 +148,7 @@ export default function EditTaskModal({
             taskId: task.id,
             content: commentContent,
           }),
-        }
+        },
       );
       setCommentContent("");
       setActiveEdit((prev) => ({ ...prev, comment: false }));
@@ -164,7 +164,7 @@ export default function EditTaskModal({
         `/tasks/comments/remove/${commentId}`,
         {
           method: "DELETE",
-        }
+        },
       );
       setComments((prev) => prev.filter((c) => c.id !== commentId));
     } catch (error) {
@@ -207,10 +207,10 @@ export default function EditTaskModal({
     }
 
     setBoardMembers((prev) =>
-      prev.filter((m) => m.name.toLowerCase().includes(search.toLowerCase()))
+      prev.filter((m) => m.name.toLowerCase().includes(search.toLowerCase())),
     );
     setTaskMembers((prev) =>
-      prev.filter((m) => m.name.toLowerCase().includes(search.toLowerCase()))
+      prev.filter((m) => m.name.toLowerCase().includes(search.toLowerCase())),
     );
   };
 
@@ -262,7 +262,7 @@ export default function EditTaskModal({
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
       setAttachments((prev) => [...prev, ...response.attachments]);
     } catch (error) {
@@ -278,10 +278,10 @@ export default function EditTaskModal({
         "/tasks/attachments/remove/" + attachmentId,
         {
           method: "DELETE",
-        }
+        },
       );
       setAttachments((prev) =>
-        prev.filter((attachment) => attachment.id !== attachmentId)
+        prev.filter((attachment) => attachment.id !== attachmentId),
       );
     } catch (error) {
       console.error("Error removing attachment:", error);
@@ -339,7 +339,7 @@ export default function EditTaskModal({
             name: labelValues.name,
             color: labelValues.color,
           }),
-        }
+        },
       );
       setLabels((prev) => [...prev, response.label]);
       setLabelMenu("default");
@@ -385,7 +385,7 @@ export default function EditTaskModal({
       })
       .then((response) => {
         setUnplashImages(
-          response.response?.results.map((data) => data.urls) || []
+          response.response?.results.map((data) => data.urls) || [],
         );
       });
   }, [isOpen]);
@@ -399,12 +399,15 @@ export default function EditTaskModal({
       onClick={resetModal}
     >
       <div
-        className="bg-gray-100 h-auto my-12 rounded-lg shadow-lg w-[768px] relative text-sm"
+        className="bg-gray-100 h-auto my-12 rounded-lg shadow-lg w-3xl relative text-sm"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
-          className="absolute top-2 right-2 size-9 flex items-center justify-center rounded-full hover:bg-gray-300"
+          className={cn(
+            "absolute top-2 right-2 size-9 flex items-center justify-center rounded-full hover:bg-gray-300",
+            (task.cover || task.coverColor) && "text-white hover:bg-gray-500",
+          )}
           onClick={resetModal}
         >
           <XMarkIcon className="size-6" />
@@ -797,7 +800,7 @@ export default function EditTaskModal({
                                       new Date().getFullYear()
                                         ? undefined
                                         : "numeric",
-                                  }
+                                  },
                                 )}
                               </span>
                             )}
@@ -819,7 +822,7 @@ export default function EditTaskModal({
                                         new Date().getFullYear()
                                           ? undefined
                                           : "numeric",
-                                    }
+                                    },
                                   )}
                                 </span>
 
@@ -1153,7 +1156,7 @@ export default function EditTaskModal({
                                 </h3>
                                 <span
                                   title={new Date(
-                                    attachment.createdAt
+                                    attachment.createdAt,
                                   ).toLocaleString("vi-VN", {
                                     dateStyle: "medium",
                                     timeStyle: "short",
@@ -1241,7 +1244,7 @@ export default function EditTaskModal({
                           className={cn(
                             "bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded-sm font-medium mr-2",
                             !commentContent &&
-                              "opacity-50 cursor-not-allowed hover:bg-blue-600"
+                              "opacity-50 cursor-not-allowed hover:bg-blue-600",
                           )}
                         >
                           Lưu
@@ -1286,7 +1289,7 @@ export default function EditTaskModal({
                                 {
                                   dateStyle: "medium",
                                   timeStyle: "short",
-                                }
+                                },
                               )}
                             >
                               {formatDateTime(comment.createdAt)}
@@ -1303,14 +1306,14 @@ export default function EditTaskModal({
                                   prevComments.map((c) =>
                                     c.id === comment.id
                                       ? { ...c, content: editCommentContent }
-                                      : c
-                                  )
+                                      : c,
+                                  ),
                                 );
                                 updateTask(task.id, {
                                   comments: task.comments.map((c) =>
                                     c.id === comment.id
                                       ? { ...c, content: editCommentContent }
-                                      : c
+                                      : c,
                                   ),
                                 });
                               }}
@@ -1893,7 +1896,7 @@ export default function EditTaskModal({
                                 <button
                                   type="button"
                                   className={clsx(
-                                    "relative w-full h-full group"
+                                    "relative w-full h-full group",
                                   )}
                                   onClick={() => handleSetCoverColor(color)}
                                 >
@@ -1922,7 +1925,7 @@ export default function EditTaskModal({
                                     <button
                                       type="button"
                                       className={clsx(
-                                        "relative w-full h-full group"
+                                        "relative w-full h-full group",
                                       )}
                                       onClick={() => handleSetCover(imageUrl)}
                                     >
@@ -2003,6 +2006,6 @@ export default function EditTaskModal({
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }

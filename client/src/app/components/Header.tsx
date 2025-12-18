@@ -1,13 +1,5 @@
 "use client";
-import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-} from "@headlessui/react";
+import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import {
   Bars3Icon,
   ArrowRightIcon,
@@ -27,6 +19,32 @@ import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { removeRefreshToken } from "../actions/auth.action";
+import dynamic from "next/dynamic";
+
+const Menu = dynamic(
+  () => import("@headlessui/react").then((mod) => mod.Menu),
+  {
+    ssr: false,
+  },
+);
+const MenuButton = dynamic(
+  () => import("@headlessui/react").then((mod) => mod.MenuButton),
+  {
+    ssr: false,
+  },
+);
+const MenuItem = dynamic(
+  () => import("@headlessui/react").then((mod) => mod.MenuItem),
+  {
+    ssr: false,
+  },
+);
+const MenuItems = dynamic(
+  () => import("@headlessui/react").then((mod) => mod.MenuItems),
+  {
+    ssr: false,
+  },
+);
 
 export default function Header({ session }: { session: Session | null }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -47,7 +65,7 @@ export default function Header({ session }: { session: Session | null }) {
     <header
       className={clsx(
         "fixed top-0 left-0 w-full text-white py-4 z-30 transition ease-out duration-300",
-        (y > 50 || pathname !== "/") && "bg-gray-900"
+        (y > 50 || pathname !== "/") && "bg-gray-900",
       )}
     >
       <nav className="max-w-7xl mx-auto px-4 flex items-center justify-between">
@@ -104,7 +122,6 @@ export default function Header({ session }: { session: Session | null }) {
           {session ? (
             <Menu as="div" className="relative">
               <MenuButton
-                type="button"
                 className="text-sm/6 text-white/80 hover:text-white cursor-pointer font-semibold flex items-center gap-x-2"
                 aria-label={session.user.name}
               >
@@ -180,11 +197,11 @@ export default function Header({ session }: { session: Session | null }) {
       >
         <DialogBackdrop
           transition
-          className="fixed inset-0 bg-black/50 duration-300 ease-out data-[closed]:opacity-0 z-40"
+          className="fixed inset-0 bg-black/50 duration-300 ease-out data-closed:opacity-0 z-40"
         />
         <DialogPanel
           transition
-          className="fixed inset-y-0 right-0 w-full overflow-y-auto bg-white px-6 py-6 duration-300 ease-out data-[closed]:translate-x-full sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 z-40"
+          className="fixed inset-y-0 right-0 w-full overflow-y-auto bg-white px-6 py-6 duration-300 ease-out data-closed:translate-x-full sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 z-40"
         >
           <div className="flex items-center justify-between">
             <Link href="/" className="-m-1.5 p-1.5 text-gray-900">
